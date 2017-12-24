@@ -1,14 +1,15 @@
 from time import time
 
+from utils.metrics.Bleu import Bleu
+from utils.metrics.Nll import Nll
+
 from models.Gan import Gan
-from models.textGan_MMD.TextganDiscriminator import Discriminator
 from models.textGan_MMD.TextganDataLoader import DataLoader, DisDataloader
+from models.textGan_MMD.TextganDiscriminator import Discriminator
 from models.textGan_MMD.TextganGenerator import Generator
 from models.textGan_MMD.TextganReward import Reward
-from oracle.oracle import OracleLstm
-from utils.Bleu import Bleu
-from utils.EmbSim import EmbSim
-from utils.Nll import Nll
+from utils.metrics.EmbSim import EmbSim
+from utils.oracle.OracleLstm import OracleLstm
 from utils.utils import *
 
 
@@ -134,9 +135,14 @@ class TextganMmd(Gan):
             for index in range(100):
                 samples = self.generator.generate(self.sess)
                 rewards = self.reward.get_reward(self.sess, samples, self.discriminator)
+                z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+                z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+
                 feed = {
                     self.generator.x: samples,
-                    self.generator.rewards: rewards
+                    self.generator.rewards: rewards,
+                    self.generator.h_0: z_h0,
+                    self.generator.c_0: z_c0,
                 }
                 _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
             end = time()

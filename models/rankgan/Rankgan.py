@@ -1,14 +1,15 @@
 from time import time
 
+from utils.metrics.Bleu import Bleu
+from utils.metrics.Nll import Nll
+
 from models.Gan import Gan
-from models.rankgan.RankganDiscriminator import Discriminator
 from models.rankgan.RankganDataLoader import DataLoader, DisDataloader
+from models.rankgan.RankganDiscriminator import Discriminator
 from models.rankgan.RankganGenerator import Generator
 from models.rankgan.RankganReward import Reward
-from oracle.oracle import OracleLstm
-from utils.Bleu import Bleu
-from utils.EmbSim import EmbSim
-from utils.Nll import Nll
+from utils.metrics.EmbSim import EmbSim
+from utils.oracle.OracleLstm import OracleLstm
 from utils.utils import *
 
 

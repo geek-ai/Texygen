@@ -1,5 +1,6 @@
-from utils.Metrics import Metrics
 import numpy as np
+
+from utils.metrics.Metrics import Metrics
 
 
 class Nll(Metrics):
@@ -24,6 +25,10 @@ class Nll(Metrics):
         self.data_loader.reset_pointer()
         for it in range(self.data_loader.num_batch):
             batch = self.data_loader.next_batch()
-            g_loss = self.sess.run(self.rnn.pretrain_loss, {self.rnn.x: batch})
+            # fixme bad taste
+            try:
+                g_loss = self.sess.run(self.rnn.pretrain_loss, {self.rnn.x: batch})
+            except Exception as e:
+                g_loss = self.rnn.get_nll(self.sess, batch)
             nll.append(g_loss)
         return np.mean(nll)

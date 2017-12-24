@@ -1,14 +1,15 @@
 from time import time
 
+from utils.metrics.Bleu import Bleu
+from utils.metrics.Nll import Nll
+
 from models.Gan import Gan
 from models.maligan_basic.MailganDiscriminator import Discriminator
 from models.maligan_basic.MaliganDataLoader import DataLoader, DisDataloader
 from models.maligan_basic.MaliganGenerator import Generator
 from models.maligan_basic.MaliganReward import Reward
-from oracle.oracle import OracleLstm
-from utils.Bleu import Bleu
-from utils.EmbSim import EmbSim
-from utils.Nll import Nll
+from utils.metrics.EmbSim import EmbSim
+from utils.oracle.OracleLstm import OracleLstm
 from utils.utils import *
 
 

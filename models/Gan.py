@@ -1,6 +1,6 @@
 from abc import abstractmethod
+
 from utils.utils import init_sess
-from utils.Metrics import Metrics
 
 
 class Gan:
@@ -65,4 +65,7 @@ class Gan:
 
     @abstractmethod
     def train_oracle(self):
+        pass
+
+    def train_cfg(self):
         pass

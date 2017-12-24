@@ -1,9 +1,10 @@
 import os
 from multiprocessing import Pool
-import random
+
 import nltk
 from nltk.translate.bleu_score import SmoothingFunction
-from utils.Metrics import Metrics
+
+from utils.metrics.Metrics import Metrics
 
 
 class Bleu(Metrics):

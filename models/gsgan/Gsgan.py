@@ -1,14 +1,15 @@
 from time import time
 
+from utils.metrics.Bleu import Bleu
+from utils.metrics.Nll import Nll
+
 from models.Gan import Gan
-from models.seqgan.SeqganDiscriminator import Discriminator
-from models.seqgan.SeqganDataLoader import DataLoader, DisDataloader
-from models.seqgan.SeqganGenerator import Generator
-from models.seqgan.SeqganReward import Reward
-from oracle.oracle import OracleLstm
-from utils.Bleu import Bleu
-from utils.EmbSim import EmbSim
-from utils.Nll import Nll
+from models.gsgan.GsganDataLoader import DataLoader, DisDataloader
+from models.gsgan.GsganDiscriminator import Discriminator
+from models.gsgan.GsganGenerator import Generator
+from models.gsgan.GsganReward import Reward
+from utils.metrics.EmbSim import EmbSim
+from utils.oracle.OracleLstm import OracleLstm
 from utils.utils import *
 
 
@@ -105,7 +106,7 @@ class Seqgan(Gan):
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)
 
-        # rollout = Reward(generator, update_rate)
+        _ = self.sess.run(self.generator.start_token)
         print('start pre-train generator:')
         for epoch in range(self.pre_epoch_num):
             start = time()

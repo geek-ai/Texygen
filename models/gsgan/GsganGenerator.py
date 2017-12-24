@@ -19,6 +19,7 @@ class Generator(object):
         self.d_params = []
         self.temperature = 1.0
         self.grad_clip = 5.0
+        self.tau = 1e-10
 
         self.expected_reward = tf.Variable(tf.zeros([self.sequence_length]))
 
@@ -27,6 +28,10 @@ class Generator(object):
             self.g_params.append(self.g_embeddings)
             self.g_recurrent_unit = self.create_recurrent_unit(self.g_params)  # maps h_tm1 to h_t for generator
             self.g_output_unit = self.create_output_unit(self.g_params)  # maps h_t to o_t (output token logits)
+
+        self.V = tf.Variable(tf.random_uniform(shape=[self.hidden_dim, self.emb_dim], minval=0, maxval=1), dtype=tf.float32,)
+
+        self.V = tf.matmul(self.V, tf.transpose(self.g_embeddings))  # [hidden_size, vocab_size]
 
         # placeholder definition
         self.x = tf.placeholder(tf.int32, shape=[self.batch_size,
@@ -40,8 +45,9 @@ class Generator(object):
                                             perm=[1, 0, 2])  # seq_length x batch_size x emb_dim
 
         # Initial states
-        self.h0 = tf.zeros([self.batch_size, self.hidden_dim])
-        self.h0 = tf.stack([self.h0, self.h0])
+        self.h_0 = tf.placeholder(tf.float32, shape=[batch_size, emb_dim])
+        self.c_0 = tf.placeholder(tf.float32, shape=[batch_size, emb_dim])
+        self.h0 = tf.stack([self.h_0, self.c_0])
 
         gen_o = tensor_array_ops.TensorArray(dtype=tf.float32, size=self.sequence_length,
                                              dynamic_size=False, infer_shape=True)
@@ -51,9 +57,9 @@ class Generator(object):
         def _g_recurrence(i, x_t, h_tm1, gen_o, gen_x):
             h_t = self.g_recurrent_unit(x_t, h_tm1)  # hidden_memory_tuple
             o_t = self.g_output_unit(h_t)  # batch x vocab , logits not prob
-            log_prob = tf.log(tf.nn.softmax(o_t))
-            next_token = tf.cast(tf.reshape(tf.multinomial(log_prob, 1), [self.batch_size]), tf.int32)
-            x_tp1 = tf.nn.embedding_lookup(self.g_embeddings, next_token)  # batch x emb_dim
+            h_plus_g = h_t[0] + self.get_gumbel(tf.shape(h_t[0]))
+            x_tp1 = tf.nn.softmax(h_plus_g/self.tau)
+            next_token = tf.cast(tf.argmax(h_plus_g, axis=1), tf.int32)
             gen_o = gen_o.write(i, tf.reduce_sum(tf.multiply(tf.one_hot(next_token, self.num_vocabulary, 1.0, 0.0),
                                                              tf.nn.softmax(o_t)), 1))  # [batch_size] , prob
             gen_x = gen_x.write(i, next_token)  # indices, batch_size
@@ -122,9 +128,30 @@ class Generator(object):
         self.g_grad, _ = tf.clip_by_global_norm(tf.gradients(self.g_loss, self.g_params), self.grad_clip)
         self.g_updates = g_opt.apply_gradients(zip(self.g_grad, self.g_params))
 
+    def get_gumbel(self, shape, eps=1e-20):
+        """Sample from Gumbel(0, 1)"""
+        u = tf.random_uniform(shape, minval=0, maxval=1, dtype=tf.float32)
+        return -tf.log(-tf.log(u + eps) + eps)
+
     def generate(self, sess):
-        outputs = sess.run(self.gen_x)
+        z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        feed = {
+            self.h_0: z_h0,
+            self.c_0: z_c0,
+        }
+        outputs = sess.run(self.gen_x, feed)
         return outputs
+
+    def get_nll(self, sess, batch):
+        z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        feed = {
+            self.h_0: z_h0,
+            self.c_0: z_c0,
+            self.x: batch
+        }
+        return sess.run(self.pretrain_loss, feed)
 
     def pretrain_step(self, sess, x):
         outputs = sess.run([self.pretrain_updates, self.pretrain_loss], feed_dict={self.x: x})

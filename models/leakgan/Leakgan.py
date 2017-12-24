@@ -1,14 +1,15 @@
 from time import time
 
+from utils.metrics.Bleu import Bleu
+from utils.metrics.Nll import Nll
+
 from models.Gan import Gan
-from models.leakgan.LeakganDiscriminator import Discriminator
 from models.leakgan.LeakganDataLoader import DataLoader, DisDataloader
+from models.leakgan.LeakganDiscriminator import Discriminator
 from models.leakgan.LeakganGenerator import Generator
 from models.leakgan.LeakganReward import Reward
-from oracle.oracle import OracleLstm
-from utils.Bleu import Bleu
-from utils.EmbSim import EmbSim
-from utils.Nll import Nll
+from utils.metrics.EmbSim import EmbSim
+from utils.oracle.OracleLstm import OracleLstm
 from utils.utils import *
 
 
