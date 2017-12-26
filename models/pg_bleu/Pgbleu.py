@@ -1,13 +1,12 @@
 from time import time
 
-from utils.metrics.Bleu import Bleu
-from utils.metrics.Nll import Nll
-
 from models.Gan import Gan
 from models.pg_bleu.PgbleuDataLoader import DataLoader
 from models.pg_bleu.PgbleuGenerator import Generator
 from models.pg_bleu.PgbleuReward import Reward
+from utils.metrics.Bleu import Bleu
 from utils.metrics.EmbSim import EmbSim
+from utils.metrics.Nll import Nll
 from utils.oracle.OracleLstm import OracleLstm
 from utils.utils import *
 
@@ -69,7 +68,7 @@ class Pgbleu(Gan):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.dis_data_loader.load_train_data(self.oracle_file, self.generator_file)
         for _ in range(3):
-            self.dis_data_loader.reset_pointer()
+            self.dis_data_loader.next_batch()
             x_batch, y_batch = self.dis_data_loader.next_batch()
             feed = {
                 self.discriminator.input_x: x_batch,

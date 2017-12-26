@@ -1,6 +1,6 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow.python.ops import tensor_array_ops, control_flow_ops
-import numpy as np
 
 
 class Generator(object):
@@ -155,7 +155,14 @@ class Generator(object):
         return sess.run(self.pretrain_loss, feed)
 
     def pretrain_step(self, sess, x):
-        outputs = sess.run([self.pretrain_updates, self.pretrain_loss], feed_dict={self.x: x})
+        z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        feed = {
+            self.h_0: z_h0,
+            self.c_0: z_c0,
+            self.x: x
+        }
+        outputs = sess.run([self.pretrain_updates, self.pretrain_loss], feed_dict=feed)
         return outputs
 
     def init_matrix(self, shape):

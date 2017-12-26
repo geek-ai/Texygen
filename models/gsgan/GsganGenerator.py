@@ -1,6 +1,6 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow.python.ops import tensor_array_ops, control_flow_ops
-import numpy as np
 
 
 class Generator(object):
@@ -59,7 +59,7 @@ class Generator(object):
             o_t = self.g_output_unit(h_t)  # batch x vocab , logits not prob
             h_plus_g = h_t[0] + self.get_gumbel(tf.shape(h_t[0]))
             x_tp1 = tf.nn.softmax(h_plus_g/self.tau)
-            next_token = tf.cast(tf.argmax(h_plus_g, axis=1), tf.int32)
+            next_token = tf.cast(tf.argmax(o_t, axis=1), tf.int32)
             gen_o = gen_o.write(i, tf.reduce_sum(tf.multiply(tf.one_hot(next_token, self.num_vocabulary, 1.0, 0.0),
                                                              tf.nn.softmax(o_t)), 1))  # [batch_size] , prob
             gen_x = gen_x.write(i, next_token)  # indices, batch_size
@@ -154,7 +154,14 @@ class Generator(object):
         return sess.run(self.pretrain_loss, feed)
 
     def pretrain_step(self, sess, x):
-        outputs = sess.run([self.pretrain_updates, self.pretrain_loss], feed_dict={self.x: x})
+        z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        feed = {
+            self.h_0: z_h0,
+            self.c_0: z_c0,
+            self.x: x
+        }
+        outputs = sess.run([self.pretrain_updates, self.pretrain_loss], feed_dict=feed)
         return outputs
 
     def init_matrix(self, shape):

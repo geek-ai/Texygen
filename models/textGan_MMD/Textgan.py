@@ -1,14 +1,13 @@
 from time import time
 
-from utils.metrics.Bleu import Bleu
-from utils.metrics.Nll import Nll
-
 from models.Gan import Gan
 from models.textGan_MMD.TextganDataLoader import DataLoader, DisDataloader
 from models.textGan_MMD.TextganDiscriminator import Discriminator
 from models.textGan_MMD.TextganGenerator import Generator
 from models.textGan_MMD.TextganReward import Reward
+from utils.metrics.Bleu import Bleu
 from utils.metrics.EmbSim import EmbSim
+from utils.metrics.Nll import Nll
 from utils.oracle.OracleLstm import OracleLstm
 from utils.utils import *
 
@@ -75,7 +74,7 @@ class TextganMmd(Gan):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.dis_data_loader.load_train_data(self.oracle_file, self.generator_file)
         for _ in range(3):
-            self.dis_data_loader.reset_pointer()
+            self.dis_data_loader.next_batch()
             x_batch, y_batch = self.dis_data_loader.next_batch()
             feed = {
                 self.discriminator.input_x: x_batch,
@@ -106,23 +105,23 @@ class TextganMmd(Gan):
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)
 
-        # print('start pre-train generator:')
-        # for epoch in range(self.pre_epoch_num):
-        #     start = time()
-        #     loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
-        #     end = time()
-        #     print('epoch:' + str(epoch) + '\t time:' + str(start - end))
-        #     if epoch % 5 == 0:
-        #         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
-        #         self.evaluate()
-        #     self.add_epoch()
+        print('start pre-train generator:')
+        for epoch in range(self.pre_epoch_num):
+            start = time()
+            loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
+            end = time()
+            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            if epoch % 5 == 0:
+                generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
+                self.evaluate()
+            self.add_epoch()
 
-        # print('start pre-train discriminator:')
-        # self.reset_epoch()
-        # for epoch in range(self.pre_epoch_num):
-        #     print('epoch:' + str(epoch))
-        #     self.train_discriminator()
-        #
+        print('start pre-train discriminator:')
+        self.reset_epoch()
+        for epoch in range(self.pre_epoch_num):
+            print('epoch:' + str(epoch))
+            self.train_discriminator()
+
         self.reset_epoch()
         self.reward = Reward()
 

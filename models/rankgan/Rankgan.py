@@ -1,14 +1,13 @@
 from time import time
 
-from utils.metrics.Bleu import Bleu
-from utils.metrics.Nll import Nll
-
 from models.Gan import Gan
 from models.rankgan.RankganDataLoader import DataLoader, DisDataloader
 from models.rankgan.RankganDiscriminator import Discriminator
 from models.rankgan.RankganGenerator import Generator
 from models.rankgan.RankganReward import Reward
+from utils.metrics.Bleu import Bleu
 from utils.metrics.EmbSim import EmbSim
+from utils.metrics.Nll import Nll
 from utils.oracle.OracleLstm import OracleLstm
 from utils.utils import *
 
@@ -74,7 +73,7 @@ class Rankgan(Gan):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.dis_data_loader.load_train_data(self.oracle_file, self.generator_file)
         for _ in range(3):
-            self.dis_data_loader.reset_pointer()
+            self.dis_data_loader.next_batch()
             x_batch, y_batch, ref_batch = self.dis_data_loader.next_batch()
             feed = {
                 self.discriminator.input_x: x_batch,

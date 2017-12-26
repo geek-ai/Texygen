@@ -1,21 +1,19 @@
 import json
 from time import time
 
-from utils.metrics.Bleu import Bleu
-from utils.metrics.Nll import Nll
-
 from models.Gan import Gan
 from models.seqgan.SeqganDataLoader import DataLoader, DisDataloader
 from models.seqgan.SeqganDiscriminator import Discriminator
 from models.seqgan.SeqganGenerator import Generator
 from models.seqgan.SeqganReward import Reward
-from utils.metrics.EmbSim import EmbSim
-from utils.oracle.OracleLstm import OracleLstm
-from utils.utils import *
-
-from utils.oracle.OracleCfg import OracleCfg
+from utils.metrics.Bleu import Bleu
 from utils.metrics.Cfg import Cfg
+from utils.metrics.EmbSim import EmbSim
+from utils.metrics.Nll import Nll
+from utils.oracle.OracleCfg import OracleCfg
+from utils.oracle.OracleLstm import OracleLstm
 from utils.text_process import *
+from utils.utils import *
 
 
 class Seqgan(Gan):
@@ -59,7 +57,7 @@ class Seqgan(Gan):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.dis_data_loader.load_train_data(self.oracle_file, self.generator_file)
         for _ in range(3):
-            self.dis_data_loader.reset_pointer()
+            self.dis_data_loader.next_batch()
             x_batch, y_batch = self.dis_data_loader.next_batch()
             feed = {
                 self.discriminator.input_x: x_batch,
@@ -157,8 +155,8 @@ class Seqgan(Gan):
             for _ in range(15):
                 self.train_discriminator()
 
-    def init_cfg_training(self):
-        oracle = OracleCfg(sequence_length=self.sequence_length)
+    def init_cfg_training(self, grammar=None):
+        oracle = OracleCfg(sequence_length=self.sequence_length, cfg_grammar=grammar)
         self.set_oracle(oracle)
         self.oracle.generate_oracle()
         self.vocab_size = self.oracle.vocab_size + 1
@@ -179,12 +177,21 @@ class Seqgan(Gan):
         self.set_data_loader(gen_loader=gen_dataloader, dis_loader=dis_dataloader, oracle_loader=oracle_dataloader)
         return oracle.wi_dict, oracle.iw_dict
 
-    def init_cfg_metric(self):
-        cfg = Cfg(test_file=self.test_file)
+    def init_cfg_metric(self, grammar=None):
+        cfg = Cfg(test_file=self.test_file, cfg_grammar=grammar)
         self.add_metric(cfg)
 
     def train_cfg(self):
-        wi_dict_loc, iw_dict_loc = self.init_cfg_training()
+        cfg_grammar = """
+          S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x
+          PLUS -> '+'
+          SUB -> '-'
+          PROD -> '*'
+          DIV -> '/'
+          x -> 'x' | 'y'
+        """
+
+        wi_dict_loc, iw_dict_loc = self.init_cfg_training(cfg_grammar)
         with open(iw_dict_loc, 'r') as file:
             iw_dict = json.load(file)
 
@@ -194,11 +201,11 @@ class Seqgan(Gan):
             with open(self.test_file, 'w') as outfile:
                 outfile.write(code_to_text(codes=codes, dictionary=dict))
 
-        self.init_cfg_metric()
+        self.init_cfg_metric(grammar=cfg_grammar)
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 10
-        self.adversarial_epoch_num = 80
+        self.pre_epoch_num = 0
+        self.adversarial_epoch_num = 200
         self.log = open('experiment-log-seqgan-cfg.csv', 'w')
         # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -253,5 +260,5 @@ class Seqgan(Gan):
 
 if __name__ == '__main__':
     seqgan = Seqgan()
-    # seqgan.train_oracle()
-    seqgan.train_cfg()
+    seqgan.train_oracle()
+    # seqgan.train_cfg()
