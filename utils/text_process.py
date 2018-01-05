@@ -1,5 +1,6 @@
 import nltk
 
+
 def text_to_code(tokens, dictionary, seq_len):
     code_str = ""
     eof_code = len(dictionary)
@@ -15,7 +16,7 @@ def text_to_code(tokens, dictionary, seq_len):
     return code_str
 
 
-def code_to_text(codes, dictionary, seq_len = None):
+def code_to_text(codes, dictionary, seq_len=None):
     paras = ""
     eof_code = len(dictionary)
     # sentence = codes.split('\n')
@@ -27,9 +28,10 @@ def code_to_text(codes, dictionary, seq_len = None):
                 paras += '\n'
                 break
             # paras += (dictionary[str(number)] + ' ')
-            paras += (dictionary[str(number)] )
+            paras += (dictionary[str(number)] + ' ')
         paras += '\n'
     return paras
+
 
 def get_tokenlized(file):
     tokenlized = list()

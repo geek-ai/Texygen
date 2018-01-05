@@ -104,7 +104,7 @@ class Seqgan(Gan):
         self.init_metric()
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 10
+        self.pre_epoch_num = 100
         self.adversarial_epoch_num = 80
         self.log = open('experiment-log-seqgan.csv', 'w')
         generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
@@ -188,7 +188,7 @@ class Seqgan(Gan):
           SUB -> '-'
           PROD -> '*'
           DIV -> '/'
-          x -> 'x' | 'y'
+          x -> 'x' 
         """
 
         wi_dict_loc, iw_dict_loc = self.init_cfg_training(cfg_grammar)
@@ -204,7 +204,7 @@ class Seqgan(Gan):
         self.init_cfg_metric(grammar=cfg_grammar)
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 0
+        self.pre_epoch_num = 10
         self.adversarial_epoch_num = 200
         self.log = open('experiment-log-seqgan-cfg.csv', 'w')
         # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
@@ -225,7 +225,7 @@ class Seqgan(Gan):
 
         print('start pre-train discriminator:')
         self.reset_epoch()
-        for epoch in range(self.pre_epoch_num):
+        for epoch in range(self.pre_epoch_num * 3):
             print('epoch:' + str(epoch))
             self.train_discriminator()
 
@@ -254,7 +254,6 @@ class Seqgan(Gan):
             self.reward.update_params()
             for _ in range(15):
                 self.train_discriminator()
-
         return
 
 

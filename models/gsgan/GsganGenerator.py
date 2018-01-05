@@ -65,7 +65,7 @@ class Generator(object):
             gen_x = gen_x.write(i, next_token)  # indices, batch_size
             return i + 1, x_tp1, h_t, gen_o, gen_x
 
-        _, _, _, self.gen_o, self.gen_x = control_flow_ops.while_loop(
+        _, _, h_t, self.gen_o, self.gen_x = control_flow_ops.while_loop(
             cond=lambda i, _1, _2, _3, _4: i < self.sequence_length,
             body=_g_recurrence,
             loop_vars=(tf.constant(0, dtype=tf.int32),
@@ -73,6 +73,8 @@ class Generator(object):
 
         self.gen_x = self.gen_x.stack()  # seq_length x batch_size
         self.gen_x = tf.transpose(self.gen_x, perm=[1, 0])  # batch_size x seq_length
+        # todo
+        self.h_t_ = h_t
 
         # supervised pretraining for generator
         g_predictions = tensor_array_ops.TensorArray(
@@ -162,6 +164,7 @@ class Generator(object):
             self.x: x
         }
         outputs = sess.run([self.pretrain_updates, self.pretrain_loss], feed_dict=feed)
+        h_t = sess.run([self.h_t_], feed_dict=feed)
         return outputs
 
     def init_matrix(self, shape):

@@ -9,6 +9,7 @@ from models.gsgan.GsganReward import Reward
 from utils.metrics.Bleu import Bleu
 from utils.metrics.Cfg import Cfg
 from utils.metrics.EmbSim import EmbSim
+from utils.metrics.Nll import Nll
 from utils.oracle.OracleCfg import OracleCfg
 from utils.oracle.OracleLstm import OracleLstm
 from utils.text_process import *
@@ -70,12 +71,12 @@ class Gsgan(Gan):
         embsim = EmbSim(model=self)
         self.add_metric(embsim)
 
-        # nll = Nll(data_loader=self.oracle_data_loader, rnn=self.oracle, sess=self.sess)
-        # self.add_metric(nll)
-        #
-        # inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
-        # inll.set_name('i-nll')
-        # self.add_metric(inll)
+        nll = Nll(data_loader=self.oracle_data_loader, rnn=self.oracle, sess=self.sess)
+        self.add_metric(nll)
+
+        inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
+        inll.set_name('i-nll')
+        self.add_metric(inll)
 
     def train_discriminator(self):
 
@@ -116,7 +117,7 @@ class Gsgan(Gan):
         self.init_metric()
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 10
+        self.pre_epoch_num = 100
         self.adversarial_epoch_num = 80
         self.log = open('experiment-log-seqgan.csv', 'w')
         generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
@@ -221,7 +222,7 @@ class Gsgan(Gan):
         self.init_cfg_metric(grammar=cfg_grammar)
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 0
+        self.pre_epoch_num = 10
         self.adversarial_epoch_num = 200
         self.log = open('experiment-log-seqgan-cfg.csv', 'w')
         # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
@@ -242,7 +243,7 @@ class Gsgan(Gan):
 
         print('start pre-train discriminator:')
         self.reset_epoch()
-        for epoch in range(self.pre_epoch_num):
+        for epoch in range(self.pre_epoch_num * 3):
             print('epoch:' + str(epoch))
             self.train_discriminator()
 
@@ -252,12 +253,17 @@ class Gsgan(Gan):
         for epoch in range(self.adversarial_epoch_num):
             print('epoch:' + str(epoch))
             start = time()
-            for index in range(1):
+            for index in range(10):
                 samples = self.generator.generate(self.sess)
                 rewards = self.reward.get_reward(self.sess, samples, 16, self.discriminator)
+                z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+                z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+
                 feed = {
                     self.generator.x: samples,
-                    self.generator.rewards: rewards
+                    self.generator.rewards: rewards,
+                    self.generator.h_0: z_h0,
+                    self.generator.c_0: z_c0,
                 }
                 _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
             end = time()
@@ -274,5 +280,5 @@ class Gsgan(Gan):
 
 if __name__ == '__main__':
     gan = Gsgan()
-    gan.train_oracle()
-    # gan.train_cfg()
+    # gan.train_oracle()
+    gan.train_cfg()

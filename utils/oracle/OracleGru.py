@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow.python.ops import tensor_array_ops, control_flow_ops
 
@@ -136,17 +137,17 @@ class OracleGru(object):
 
     def create_recurrent_unit(self, params):
 
-        self.Wz = tf.Variable(tf.random_normal([self.emb_dim, self.hidden_dim], 0.0, 1000000.0, seed=111))
-        self.Uz = tf.Variable(tf.random_normal([self.hidden_dim, self.hidden_dim], 0.0, 1000000.0, seed=211))
-        self.bz = tf.Variable(tf.random_normal([self.hidden_dim, ], 0.0, 1000000.0, seed=311))
+        self.Wz = tf.Variable(tf.random_normal([self.emb_dim, self.hidden_dim], 0.0, 0.1, seed=111))
+        self.Uz = tf.Variable(tf.random_normal([self.hidden_dim, self.hidden_dim], 0.0, 0.1, seed=211))
+        self.bz = tf.Variable(tf.random_normal([self.hidden_dim, ], 0.0, 0.1, seed=311))
 
-        self.Wr = tf.Variable(tf.random_normal([self.emb_dim, self.hidden_dim], 0.0, 1000000.0, seed=112))
-        self.Ur = tf.Variable(tf.random_normal([self.hidden_dim, self.hidden_dim], 0.0, 1000000.0, seed=212))
-        self.br = tf.Variable(tf.random_normal([self.hidden_dim, ], 0.0, 1000000.0, seed=312))
+        self.Wr = tf.Variable(tf.random_normal([self.emb_dim, self.hidden_dim], 0.0, 0.1, seed=112))
+        self.Ur = tf.Variable(tf.random_normal([self.hidden_dim, self.hidden_dim], 0.0, 0.1, seed=212))
+        self.br = tf.Variable(tf.random_normal([self.hidden_dim, ], 0.0, 0.1, seed=312))
 
-        self.W = tf.Variable(tf.random_normal([self.emb_dim, self.hidden_dim], 0.0, 1000000.0, seed=113))
-        self.U = tf.Variable(tf.random_normal([self.hidden_dim, self.hidden_dim], 0.0, 1000000.0, seed=213))
-        self.b = tf.Variable(tf.random_normal([self.hidden_dim, ], 0.0, 1000000.0, seed=313))
+        self.W = tf.Variable(tf.random_normal([self.emb_dim, self.hidden_dim], 0.0, 0.1, seed=113))
+        self.U = tf.Variable(tf.random_normal([self.hidden_dim, self.hidden_dim], 0.0, 0.1, seed=213))
+        self.b = tf.Variable(tf.random_normal([self.hidden_dim, ], 0.0, 0.1, seed=313))
 
         params.extend([
             self.Wz, self.Uz, self.bz,
