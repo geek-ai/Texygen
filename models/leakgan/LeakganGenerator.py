@@ -1,6 +1,6 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow.python.ops import tensor_array_ops, control_flow_ops
-import numpy as np
 
 
 class Generator(object):
@@ -340,6 +340,12 @@ class Generator(object):
             self.worker_updates = worker_opt.apply_gradients(
                 zip(self.worker_grad, self.worker_params))
 
+        self.pretrain_loss = -tf.reduce_sum(
+            tf.one_hot(tf.to_int32(tf.reshape(self.x, [-1])), self.num_vocabulary, 1.0, 0.0) * tf.log(
+                tf.clip_by_value(tf.reshape(self.g_predictions, [-1, self.num_vocabulary]), 1e-20, 1.0)
+            )
+        ) / (self.sequence_length * self.batch_size)
+
     def rollout(self, input_x, given_num):
         with tf.device("/cpu:0"):
             processed_x = tf.transpose(tf.nn.embedding_lookup(self.g_embeddings, input_x),
@@ -449,6 +455,13 @@ class Generator(object):
                             self.pretrain_goal_loss],
                            feed_dict={self.x: x, self.drop_out: dropout_keep_prob})
         return outputs
+
+    def get_nll(self, sess, x):
+        dropout_keep_prob = 1
+        outputs = sess.run([self.pretrain_worker_updates, self.pretrain_worker_loss, self.pretrain_manager_updates,
+                            self.pretrain_goal_loss],
+                           feed_dict={self.x: x, self.drop_out: dropout_keep_prob})
+        return outputs[1]
 
     def generate(self, sess, dropout_keep_prob, train=1):
         outputs = sess.run(self.gen_x, feed_dict={self.drop_out: dropout_keep_prob, self.train: train})

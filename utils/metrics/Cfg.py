@@ -31,7 +31,10 @@ class Cfg(Metrics):
                     continue
                 else:
                     total_num += 1
+                    s = "".join(s.split())
                     for _ in self.parser.parse(s):
                         valid_num += 1
                         break
+        if total_num == 0:
+            return 0
         return valid_num / total_num

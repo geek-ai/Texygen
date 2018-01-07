@@ -41,14 +41,6 @@ class DocEmbSim(Metrics):
                 words.append(text)
         return words
 
-    # def build_dictionary(self):
-    #     words = self.read_data(self.oracle_file)
-    #     data, count, dictionary, reverse_dictionary = build_dataset(words)
-    #     print('Most common words (+UNK)', count[:5])
-    #     print('Sample data', data[:10])
-    #     del words  # Hint to reduce memory.
-    #     return data, count, dictionary, reverse_dictionary
-
     def generate_batch(self, batch_size, num_skips, skip_window, data=None):
         global data_index
         assert batch_size % num_skips == 0
@@ -146,10 +138,13 @@ class DocEmbSim(Metrics):
                         # The average loss is an estimate of the loss over the last 2000 batches.
                         print('Average loss at step %d: %f' % (step, average_loss))
                         average_loss = 0
-                    if step % 10000 == 0:
-                        sim = similarity.eval()
+                        # if step % 10000 == 0:
+                        #     sim = similarity.eval()
                 final_embeddings = normalized_embeddings.eval()
-                return final_embeddings
+                norm = tf.sqrt(tf.reduce_sum(tf.square(final_embeddings), 1, keep_dims=True))
+                normalized_embeddings = final_embeddings / norm
+                similarity = np.matmul(normalized_embeddings, normalized_embeddings)
+                return similarity
 
     def get_oracle_sim(self):
         self.oracle_sim = self.get_wordvec(self.oracle_file)
