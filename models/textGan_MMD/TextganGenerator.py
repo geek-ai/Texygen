@@ -64,10 +64,10 @@ class Generator(object):
             h_t = self.g_recurrent_unit(x_t, h_tm1)  # hidden_memory_tuple
             o_t = self.g_output_unit(h_t)  # batch x vocab , logits not prob
             # todo: need code review!!!
-            hv = tf.matmul(h_t[0], self.V,)
-            next_token = tf.cast(tf.argmax(hv, axis=1), tf.int32)
+            # hv = o_t
+            next_token = tf.cast(tf.argmax(o_t, axis=1), tf.int32)
             # next_token = tf.cast(tf.argmax(tf.nn.softmax(tf.multiply(hv, 1e4)), axis=1), tf.int32)
-            x_tp1 = tf.matmul(tf.nn.softmax(tf.multiply(hv, 2e2)), self.g_embeddings)
+            x_tp1 = tf.matmul(tf.nn.softmax(tf.multiply(o_t, 2e2)), self.g_embeddings)
             gen_o = gen_o.write(i, tf.reduce_sum(tf.multiply(tf.one_hot(next_token, self.num_vocabulary, 1.0, 0.0),
                                                              tf.nn.softmax(o_t)), 1))  # [batch_size] , prob
             gen_x = gen_x.write(i, next_token)  # indices, batch_size
@@ -94,8 +94,11 @@ class Generator(object):
         def _pretrain_recurrence(i, x_t, h_tm1, g_predictions):
             h_t = self.g_recurrent_unit(x_t, h_tm1)
             o_t = self.g_output_unit(h_t)
+            # hv = o_t
+            next_token = tf.cast(tf.argmax(o_t, axis=1), tf.int32)
+            x_tp1 = tf.matmul(tf.nn.softmax(tf.multiply(o_t, 2e2)), self.g_embeddings)
             g_predictions = g_predictions.write(i, tf.nn.softmax(o_t))  # batch x vocab_size
-            x_tp1 = ta_emb_x.read(i)
+            # x_tp1 = ta_emb_x.read(i)
             return i + 1, x_tp1, h_t, g_predictions
 
         _, _, _, self.g_predictions = control_flow_ops.while_loop(

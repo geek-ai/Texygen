@@ -1,15 +1,12 @@
 from models.seqgan.Seqgan import Seqgan
-from models.maligan_basic.Maligan import Maligan
-from models.textGan_basic.Textgan import TextganBasic
-from models.textGan_MMD.Textgan import TextganMmd
-from models.pg_bleu.Pgbleu import Pgbleu
-from models.rankgan.Rankgan import Rankgan
 
 if __name__ == '__main__':
     # gans = []
 
     seqgan = Seqgan()
-    seqgan.train_oracle()
+    # seqgan.train_oracle()
+    seqgan.generate_num = 10000
+    seqgan.train_real('data/shi.txt')
     # maligan = Maligan()
     # # maligan.train_oracle()
     # textganbasic = TextganBasic()

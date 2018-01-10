@@ -11,20 +11,18 @@ from utils.metrics.Metrics import Metrics
 
 
 class DocEmbSim(Metrics):
-    def __init__(self, model):
+    def __init__(self, oracle_file=None, generator_file=None, num_vocabulary = None):
         super().__init__()
         self.name = 'EmbeddingSimilarity'
-        self.sess = model.sess
-        self.oracle = model.oracle
-        self.generator = model.generator
         self.oracle_sim = None
         self.gen_sim = None
         self.is_first = True
-        self.oracle_file = None
-        self.generator_file = None
-        self.num_vocabulary = None
+        self.oracle_file = oracle_file
+        self.generator_file = generator_file
+        self.num_vocabulary = num_vocabulary
         self.batch_size = 64
         self.embedding_size = 32
+        self.data_index = 0
 
     def get_score(self):
         if self.is_first:
@@ -42,7 +40,6 @@ class DocEmbSim(Metrics):
         return words
 
     def generate_batch(self, batch_size, num_skips, skip_window, data=None):
-        global data_index
         assert batch_size % num_skips == 0
         assert num_skips <= 2 * skip_window
         batch = np.ndarray(shape=(batch_size), dtype=np.int32)
@@ -50,8 +47,8 @@ class DocEmbSim(Metrics):
         span = 2 * skip_window + 1  # [ skip_window target skip_window ]
         buffer = collections.deque(maxlen=span)
         for _ in range(span):
-            buffer.append(data[data_index])
-            data_index = (data_index + 1) % len(data)
+            buffer.append(data[self.data_index])
+            self.data_index = (self.data_index + 1) % len(data)
         for i in range(batch_size // num_skips):
             target = skip_window  # target label at the center of the buffer
             targets_to_avoid = [skip_window]
@@ -61,8 +58,8 @@ class DocEmbSim(Metrics):
                 targets_to_avoid.append(target)
                 batch[i * num_skips + j] = buffer[skip_window]
                 labels[i * num_skips + j, 0] = buffer[target]
-            buffer.append(data[data_index])
-            data_index = (data_index + 1) % len(data)
+            buffer.append(data[self.data_index])
+            self.data_index = (self.data_index + 1) % len(data)
         return batch, labels
 
     def get_wordvec(self, file):
@@ -71,15 +68,15 @@ class DocEmbSim(Metrics):
         embedding_size = self.embedding_size
         vocabulary_size = self.num_vocabulary
         num_sampled = 64
-        num_steps = 15000
+        num_steps = 10
         skip_window = 1  # How many words to consider left and right.
         num_skips = 2  # How many times to reuse an input to generate a label.
 
-        with graph.as_default(), tf.device('/cpu:0'):
+        with graph.as_default():
+
             # Input data.
             train_dataset = tf.placeholder(tf.int32, shape=[batch_size])
             train_labels = tf.placeholder(tf.int32, shape=[batch_size, 1])
-            valid_dataset = tf.constant(np.array(range(self.num_vocabulary)), dtype=tf.int32)
 
             # initial Variables.
             embeddings = tf.Variable(
@@ -109,42 +106,44 @@ class DocEmbSim(Metrics):
             # We use the cosine distance:
             norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
             normalized_embeddings = embeddings / norm
-            valid_embeddings = tf.nn.embedding_lookup(
-                normalized_embeddings, valid_dataset)
-            similarity = tf.matmul(valid_embeddings, tf.transpose(normalized_embeddings))
+            similarity = tf.matmul(normalized_embeddings, tf.transpose(normalized_embeddings))
+            # valid_embeddings = tf.nn.embedding_lookup(
+            #     normalized_embeddings, valid_dataset)
+            # similarity = tf.matmul(valid_embeddings, tf.transpose(normalized_embeddings))
 
             data = self.read_data(file)
 
             with tf.Session(graph=graph) as session:
-                # tf.global_variables_initializer().run()
+                tf.global_variables_initializer().run()
                 average_loss = 0
                 generate_num = len(data)
                 for step in range(num_steps):
-                    batch_data = list()
-                    batch_labels = list()
+                    # batch_data = list()
+                    # batch_labels = list()
                     for index in range(generate_num):
                         cur_batch_data, cur_batch_labels = self.generate_batch(
                             batch_size, num_skips, skip_window, data[index])
-                        batch_data += cur_batch_data
-                        batch_labels += cur_batch_labels
-                    batch_data = np.array(batch_data)
-                    batch_labels = np.array(batch_labels)
-                    feed_dict = {train_dataset: batch_data, train_labels: batch_labels}
-                    _, l = session.run([optimizer, loss], feed_dict=feed_dict)
-                    average_loss += l
+                        # batch_data += np.ndarray.tolist(cur_batch_data)
+                        # batch_labels += np.ndarray.tolist(cur_batch_labels)
+                        # batch_data = np.array(batch_data)
+                        # batch_labels = np.array(batch_labels)
+                        feed_dict = {train_dataset: cur_batch_data, train_labels: cur_batch_labels}
+                        _, l = session.run([optimizer, loss], feed_dict=feed_dict)
+                        average_loss += l
                     if step % 2000 == 0:
                         if step > 0:
-                            average_loss = average_loss / 2000
+                            average_loss = average_loss / (2000*generate_num)
                         # The average loss is an estimate of the loss over the last 2000 batches.
                         print('Average loss at step %d: %f' % (step, average_loss))
                         average_loss = 0
                         # if step % 10000 == 0:
                         #     sim = similarity.eval()
-                final_embeddings = normalized_embeddings.eval()
-                norm = tf.sqrt(tf.reduce_sum(tf.square(final_embeddings), 1, keep_dims=True))
-                normalized_embeddings = final_embeddings / norm
-                similarity = np.matmul(normalized_embeddings, normalized_embeddings)
-                return similarity
+                # final_embeddings = normalized_embeddings.eval()
+                # norm = np.sqrt(np.sum(np.square(final_embeddings), axis=1, keepdims=True))
+                # normalized_embeddings = np.divide(final_embeddings, norm)
+                # similarity = np.matmul(normalized_embeddings, normalized_embeddings.T)
+                similarity_value = similarity.eval()
+                return similarity_value
 
     def get_oracle_sim(self):
         self.oracle_sim = self.get_wordvec(self.oracle_file)
