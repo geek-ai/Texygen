@@ -100,8 +100,8 @@ class TextganBasic(Gan):
         self.init_metric()
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 1
-        self.adversarial_epoch_num = 80
+        self.pre_epoch_num = 80
+        self.adversarial_epoch_num = 100
         self.log = open('experiment-log-textgan-basic.csv', 'w')
         oracle_code = generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -187,12 +187,12 @@ class TextganBasic(Gan):
         from utils.text_process import get_tokenlized
         from utils.text_process import code_to_text
         cfg_grammar = """
-          S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x
+          S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x | '(' S ')'
           PLUS -> '+'
           SUB -> '-'
           PROD -> '*'
           DIV -> '/'
-          x -> 'x' 
+          x -> 'x' | 'y'
         """
 
         wi_dict_loc, iw_dict_loc = self.init_cfg_training(cfg_grammar)
@@ -208,8 +208,8 @@ class TextganBasic(Gan):
         self.init_cfg_metric(grammar=cfg_grammar)
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 10
-        self.adversarial_epoch_num = 200
+        self.pre_epoch_num = 80
+        self.adversarial_epoch_num = 100
         self.log = open('experiment-log-textganbasic-cfg.csv', 'w')
         # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         oracle_code = generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)

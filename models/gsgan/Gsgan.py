@@ -117,8 +117,8 @@ class Gsgan(Gan):
         self.init_metric()
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 100
-        self.adversarial_epoch_num = 80
+        self.pre_epoch_num = 80
+        self.adversarial_epoch_num = 100
         self.log = open('experiment-log-seqgan.csv', 'w')
         generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -152,8 +152,8 @@ class Gsgan(Gan):
             for index in range(1):
                 samples = self.generator.generate(self.sess)
                 rewards = self.reward.get_reward(self.sess, samples, 16, self.discriminator)
-                z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
-                z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+                z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
+                z_c0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
 
                 feed = {
                     self.generator.x: samples,
@@ -201,12 +201,12 @@ class Gsgan(Gan):
 
     def train_cfg(self):
         cfg_grammar = """
-          S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x
+          S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x | '(' S ')'
           PLUS -> '+'
           SUB -> '-'
           PROD -> '*'
           DIV -> '/'
-          x -> 'x'
+          x -> 'x' | 'y'
         """
 
         wi_dict_loc, iw_dict_loc = self.init_cfg_training(cfg_grammar)
@@ -222,8 +222,8 @@ class Gsgan(Gan):
         self.init_cfg_metric(grammar=cfg_grammar)
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 10
-        self.adversarial_epoch_num = 200
+        self.pre_epoch_num = 80
+        self.adversarial_epoch_num = 100
         self.log = open('experiment-log-seqgan-cfg.csv', 'w')
         # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -256,8 +256,8 @@ class Gsgan(Gan):
             for index in range(10):
                 samples = self.generator.generate(self.sess)
                 rewards = self.reward.get_reward(self.sess, samples, 16, self.discriminator)
-                z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
-                z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+                z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
+                z_c0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
 
                 feed = {
                     self.generator.x: samples,

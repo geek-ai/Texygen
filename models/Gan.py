@@ -50,12 +50,17 @@ class Gan:
         self.epoch = 0
 
     def evaluate(self):
+        from time import time
         log = "epoch:" + str(self.epoch) + '\t'
         scores = list()
         scores.append(self.epoch)
         for metric in self.metrics:
-            log += metric.get_name() + ":" + str(metric.get_score()) + '\t'
-            scores.append(metric.get_score())
+            tic = time()
+            score = metric.get_score()
+            log += metric.get_name() + ":" + str(score) + '\t'
+            toc = time()
+            print('time elapsed of ' + metric.get_name() + ': ' + str(toc - tic))
+            scores.append(score)
         print(log)
         return scores
 

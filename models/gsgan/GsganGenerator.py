@@ -19,7 +19,7 @@ class Generator(object):
         self.d_params = []
         self.temperature = 1.0
         self.grad_clip = 5.0
-        self.tau = 1e-10
+        self.tau = 1e-4
 
         self.expected_reward = tf.Variable(tf.zeros([self.sequence_length]))
 
@@ -89,7 +89,8 @@ class Generator(object):
             h_t = self.g_recurrent_unit(x_t, h_tm1)
             o_t = self.g_output_unit(h_t)
             g_predictions = g_predictions.write(i, tf.nn.softmax(o_t))  # batch x vocab_size
-            x_tp1 = ta_emb_x.read(i)
+            h_plus_g = h_t[0] + self.get_gumbel(tf.shape(h_t[0]))
+            x_tp1 = tf.nn.softmax(h_plus_g/self.tau)
             return i + 1, x_tp1, h_t, g_predictions
 
         _, _, _, self.g_predictions = control_flow_ops.while_loop(
@@ -130,14 +131,14 @@ class Generator(object):
         self.g_grad, _ = tf.clip_by_global_norm(tf.gradients(self.g_loss, self.g_params), self.grad_clip)
         self.g_updates = g_opt.apply_gradients(zip(self.g_grad, self.g_params))
 
-    def get_gumbel(self, shape, eps=1e-20):
+    def get_gumbel(self, shape, eps=1e-3):
         """Sample from Gumbel(0, 1)"""
         u = tf.random_uniform(shape, minval=0, maxval=1, dtype=tf.float32)
         return -tf.log(-tf.log(u + eps) + eps)
 
     def generate(self, sess):
-        z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
-        z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
+        z_c0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
         feed = {
             self.h_0: z_h0,
             self.c_0: z_c0,
@@ -146,8 +147,8 @@ class Generator(object):
         return outputs
 
     def get_nll(self, sess, batch):
-        z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
-        z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
+        z_c0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
         feed = {
             self.h_0: z_h0,
             self.c_0: z_c0,
@@ -156,8 +157,8 @@ class Generator(object):
         return sess.run(self.pretrain_loss, feed)
 
     def pretrain_step(self, sess, x):
-        z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
-        z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
+        z_c0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
         feed = {
             self.h_0: z_h0,
             self.c_0: z_c0,

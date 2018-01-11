@@ -1,7 +1,8 @@
-from nltk.parse.generate import generate
-from nltk import CFG
-import nltk
 import json
+
+from nltk import CFG
+from nltk.parse.generate import generate
+
 from utils.text_process import *
 
 
@@ -16,7 +17,7 @@ from utils.text_process import *
 # """
 
 # cfg_grammar = """
-#   S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x
+#   S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x | '(' S ')'
 #   PLUS -> '+'
 #   SUB -> '-'
 #   PROD -> '*'
@@ -38,7 +39,7 @@ class OracleCfg:
                  sequence_length=None):
         if cfg_grammar is None:
             cfg_grammar = """
-              S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x
+              S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x | '(' S ')'
               PLUS -> '+'
               SUB -> '-'
               PROD -> '*'
@@ -55,7 +56,9 @@ class OracleCfg:
         self.vocab_size = None
         return
 
-    def generate_sentence(self, depth=9, num=None):
+    def generate_sentence(self, depth=9, num=30000):
+        if num > 30000:
+            num = 30000
         sentences = generate(self.grammar, depth=depth, n=num)
         with open(self.origin_file, 'w') as file:
             for s in sentences:

@@ -6,7 +6,6 @@ from models.seqgan.SeqganDataLoader import DataLoader, DisDataloader
 from models.seqgan.SeqganDiscriminator import Discriminator
 from models.seqgan.SeqganGenerator import Generator
 from models.seqgan.SeqganReward import Reward
-from utils.metrics.Bleu import Bleu
 from utils.metrics.Cfg import Cfg
 from utils.metrics.EmbSim import EmbSim
 from utils.metrics.Nll import Nll
@@ -38,8 +37,8 @@ class Seqgan(Gan):
 
     def init_metric(self):
 
-        bleu = Bleu(test_text=self.generator_file, real_text=self.oracle_file)
-        self.add_metric(bleu)
+        # bleu = Bleu(test_text=self.generator_file, real_text=self.oracle_file)
+        # self.add_metric(bleu)
 
         self.generator.set_similarity()
         self.oracle.set_similarity()
@@ -52,6 +51,10 @@ class Seqgan(Gan):
         inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
         inll.set_name('i-nll')
         self.add_metric(inll)
+
+        from utils.metrics.DocEmbSim import DocEmbSim
+        docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file, num_vocabulary=self.vocab_size)
+        self.add_metric(docsim)
 
     def train_discriminator(self):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -105,8 +108,8 @@ class Seqgan(Gan):
         self.init_metric()
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 100
-        self.adversarial_epoch_num = 80
+        self.pre_epoch_num = 80
+        self.adversarial_epoch_num = 100
         self.log = open('experiment-log-seqgan.csv', 'w')
         generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -184,12 +187,12 @@ class Seqgan(Gan):
 
     def train_cfg(self):
         cfg_grammar = """
-          S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x
+          S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x | '(' S ')'
           PLUS -> '+'
           SUB -> '-'
           PROD -> '*'
           DIV -> '/'
-          x -> 'x' 
+          x -> 'x' | 'y'
         """
 
         wi_dict_loc, iw_dict_loc = self.init_cfg_training(cfg_grammar)
@@ -205,8 +208,8 @@ class Seqgan(Gan):
         self.init_cfg_metric(grammar=cfg_grammar)
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 10
-        self.adversarial_epoch_num = 200
+        self.pre_epoch_num = 80
+        self.adversarial_epoch_num = 100
         self.log = open('experiment-log-seqgan-cfg.csv', 'w')
         # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -258,8 +261,8 @@ class Seqgan(Gan):
         return
 
     def init_real_trainng(self, data_loc=None):
-        from utils.text_process import text_precess
-        from utils.text_process import get_tokenlized
+        from utils.text_process import text_precess, text_to_code
+        from utils.text_process import get_tokenlized, get_word_list, get_dict
         if data_loc is None:
             data_loc = '../../data/image_coco.txt'
         self.sequence_length, self.vocab_size = text_precess(data_loc)
@@ -289,9 +292,11 @@ class Seqgan(Gan):
         from utils.metrics.DocEmbSim import DocEmbSim
         docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file, num_vocabulary=self.vocab_size)
         self.add_metric(docsim)
-        pass
+
 
     def train_real(self, data_loc=None):
+        from utils.text_process import code_to_text
+        from utils.text_process import get_tokenlized
         wi_dict, iw_dict = self.init_real_trainng(data_loc)
         self.init_real_metric()
 
@@ -303,8 +308,8 @@ class Seqgan(Gan):
 
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 100
-        self.adversarial_epoch_num = 80
+        self.pre_epoch_num = 80
+        self.adversarial_epoch_num = 100
         self.log = open('experiment-log-seqgan-real.csv', 'w')
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.gen_data_loader.create_batches(self.oracle_file)
@@ -358,4 +363,4 @@ if __name__ == '__main__':
     seqgan = Seqgan()
     # seqgan.train_oracle()
     # seqgan.train_cfg()
-    seqgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/shi.txt')
+    seqgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/toy.txt')

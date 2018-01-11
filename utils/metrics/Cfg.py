@@ -9,7 +9,7 @@ class Cfg(Metrics):
         self.name = 'cfg'
         if cfg_grammar is None:
             cfg_grammar = """
-              S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x
+              S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x | '(' S ')'
               PLUS -> '+'
               SUB -> '-'
               PROD -> '*'

@@ -19,11 +19,6 @@ class Generator(object):
         self.d_params = []
         self.temperature = 1.0
         self.grad_clip = 5.0
-
-
-
-
-
         self.expected_reward = tf.Variable(tf.zeros([self.sequence_length]))
 
         with tf.variable_scope('generator'):
@@ -31,10 +26,6 @@ class Generator(object):
             self.g_params.append(self.g_embeddings)
             self.g_recurrent_unit = self.create_recurrent_unit(self.g_params)  # maps h_tm1 to h_t for generator
             self.g_output_unit = self.create_output_unit(self.g_params)  # maps h_t to o_t (output token logits)
-
-        self.Weight = tf.Variable(tf.random_uniform(shape=[self.hidden_dim, self.emb_dim], minval=0, maxval=.1), dtype=tf.float32,)
-
-        self.V = tf.matmul(self.Weight, tf.transpose(self.g_embeddings))  # [hidden_size, vocab_size]
 
         # placeholder definition
         self.x = tf.placeholder(tf.int32, shape=[self.batch_size,
@@ -67,7 +58,7 @@ class Generator(object):
             # hv = o_t
             next_token = tf.cast(tf.argmax(o_t, axis=1), tf.int32)
             # next_token = tf.cast(tf.argmax(tf.nn.softmax(tf.multiply(hv, 1e4)), axis=1), tf.int32)
-            x_tp1 = tf.matmul(tf.nn.softmax(tf.multiply(o_t, 2e2)), self.g_embeddings)
+            x_tp1 = tf.matmul(tf.nn.softmax(tf.multiply(o_t, 1e3)), self.g_embeddings)
             gen_o = gen_o.write(i, tf.reduce_sum(tf.multiply(tf.one_hot(next_token, self.num_vocabulary, 1.0, 0.0),
                                                              tf.nn.softmax(o_t)), 1))  # [batch_size] , prob
             gen_x = gen_x.write(i, next_token)  # indices, batch_size
@@ -96,7 +87,7 @@ class Generator(object):
             o_t = self.g_output_unit(h_t)
             # hv = o_t
             next_token = tf.cast(tf.argmax(o_t, axis=1), tf.int32)
-            x_tp1 = tf.matmul(tf.nn.softmax(tf.multiply(o_t, 2e2)), self.g_embeddings)
+            x_tp1 = tf.matmul(tf.nn.softmax(tf.multiply(o_t, 1e3)), self.g_embeddings)
             g_predictions = g_predictions.write(i, tf.nn.softmax(o_t))  # batch x vocab_size
             # x_tp1 = ta_emb_x.read(i)
             return i + 1, x_tp1, h_t, g_predictions
@@ -140,8 +131,8 @@ class Generator(object):
         self.g_updates = g_opt.apply_gradients(zip(self.g_grad, self.g_params))
 
     def generate(self, sess):
-        z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
-        z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
+        z_c0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
         feed = {
             self.h_0: z_h0,
             self.c_0: z_c0,
@@ -150,8 +141,8 @@ class Generator(object):
         return outputs
 
     def get_nll(self, sess, batch):
-        z_h0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
-        z_c0 = np.random.uniform(low=0, high=1, size=[self.batch_size, self.emb_dim])
+        z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
+        z_c0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
         feed = {
             self.h_0: z_h0,
             self.c_0: z_c0,
@@ -160,8 +151,8 @@ class Generator(object):
         return sess.run(self.pretrain_loss, feed)
 
     def pretrain_step(self, sess, x):
-        z_h0 = np.random.uniform(low=-.10, high=.1, size=[self.batch_size, self.emb_dim])
-        z_c0 = np.random.uniform(low=-.10, high=.1, size=[self.batch_size, self.emb_dim])
+        z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
+        z_c0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
         feed = {
             self.h_0: z_h0,
             self.c_0: z_c0,
@@ -171,7 +162,7 @@ class Generator(object):
         return outputs
 
     def init_matrix(self, shape):
-        return tf.random_normal(shape, stddev=0.1)
+        return tf.random_normal(shape, stddev=5)
 
     def init_vector(self, shape):
         return tf.zeros(shape)
