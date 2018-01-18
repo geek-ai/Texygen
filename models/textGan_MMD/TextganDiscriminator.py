@@ -61,6 +61,7 @@ class Discriminator(object):
         # Placeholders for input, output and dropout
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
+
         self.dropout_keep_prob = dropout_keep_prob
         # self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
 
@@ -76,10 +77,22 @@ class Discriminator(object):
                 self.embedded_chars = tf.nn.embedding_lookup(self.W, self.input_x)
                 self.embedded_chars_expanded = tf.expand_dims(self.embedded_chars, -1)
 
+            pooled_outputs = []
+            self.W_conv = list()
+            self.b_conv = list()
+            for filter_size, num_filter in zip(filter_sizes, num_filters):
+                with tf.name_scope("conv-maxpool-%s" % filter_size):
+                    # Convolution Layer
+                    filter_shape = [filter_size, emd_dim, 1, num_filter]
+                    W = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1), name="W")
+                    self.W_conv.append(W)
+                    b = tf.Variable(tf.constant(0.1, shape=[num_filter]), name="b")
+                    self.b_conv.append(b)
+
             # Create a convolution + maxpool layer for each filter size
             pooled_outputs = []
             for filter_size, num_filter in zip(filter_sizes, num_filters):
-                with tf.name_scope("conv-maxpool-%s" % filter_size):
+                with tf.name_scope("conv-maxpool-%s-midterm" % filter_size):
                     # Convolution Layer
                     filter_shape = [filter_size, emd_dim, 1, num_filter]
                     W = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1), name="W")

@@ -129,6 +129,10 @@ class Leakgan(Gan):
         inll.set_name('i-nll')
         self.add_metric(inll)
 
+        from utils.metrics.DocEmbSim import DocEmbSim
+        docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file, num_vocabulary=self.vocab_size)
+        self.add_metric(docsim)
+
     def train_discriminator(self):
         generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.dis_data_loader.load_train_data(self.oracle_file, self.generator_file)
@@ -170,7 +174,7 @@ class Leakgan(Gan):
             start = time()
             loss = pre_train_epoch_gen(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             if epoch % 5 == 0:
                 generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                 self.evaluate()
@@ -203,7 +207,7 @@ class Leakgan(Gan):
                     print('epoch', str(epoch), 'g_loss', g_loss, 'w_loss', w_loss)
                 end = time()
                 self.add_epoch()
-                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(start - end))
+                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(end - start))
                 if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                     generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                     self.evaluate()
@@ -214,7 +218,7 @@ class Leakgan(Gan):
                 start = time()
                 loss = pre_train_epoch_gen(self.sess, self.generator, self.gen_data_loader)
                 end = time()
-                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(start - end))
+                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(end - start))
                 self.add_epoch()
                 if epoch % 5 == 0:
                     generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num,
@@ -299,7 +303,7 @@ class Leakgan(Gan):
             start = time()
             loss = pre_train_epoch_gen(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0:
                 generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -333,7 +337,7 @@ class Leakgan(Gan):
                     print('epoch', str(epoch), 'g_loss', g_loss, 'w_loss', w_loss)
                 end = time()
                 self.add_epoch()
-                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(start - end))
+                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(end - start))
                 if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                     generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                     get_cfg_test_file()
@@ -345,7 +349,7 @@ class Leakgan(Gan):
                 start = time()
                 loss = pre_train_epoch_gen(self.sess, self.generator, self.gen_data_loader)
                 end = time()
-                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(start - end))
+                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(end - start))
                 self.add_epoch()
                 if epoch % 5 == 0:
                     generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num,
@@ -426,7 +430,7 @@ class Leakgan(Gan):
             start = time()
             loss = pre_train_epoch_gen(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             if epoch % 5 == 0:
                 generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                 get_real_test_file()
@@ -439,6 +443,8 @@ class Leakgan(Gan):
             print('epoch:' + str(epoch))
             self.train_discriminator()
 
+
+        self.reset_epoch()
         self.reward = Reward(model=self.generator, dis=self.discriminator, sess=self.sess, rollout_num=4)
         for epoch in range(self.adversarial_epoch_num//10):
             for epoch_ in range(10):
@@ -458,7 +464,7 @@ class Leakgan(Gan):
                     print('epoch', str(epoch), 'g_loss', g_loss, 'w_loss', w_loss)
                 end = time()
                 self.add_epoch()
-                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(start - end))
+                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(end - start))
                 if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                     generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                     get_real_test_file()
@@ -470,18 +476,18 @@ class Leakgan(Gan):
                 start = time()
                 loss = pre_train_epoch_gen(self.sess, self.generator, self.gen_data_loader)
                 end = time()
-                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(start - end))
-                self.add_epoch()
+                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(end - start))
+                # self.add_epoch()
                 if epoch % 5 == 0:
                     generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num,
                                          self.generator_file)
                     get_real_test_file()
-                    self.evaluate()
+                    # self.evaluate()
             for epoch_ in range(5):
                 print('epoch:' + str(epoch) + '--' + str(epoch_))
                 self.train_discriminator()
 
 if __name__ == '__main__':
     gan = Leakgan()
-    # gan.train_oracle()
+    gan.train_oracle()
     # gan.train_cfg()

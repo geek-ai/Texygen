@@ -36,9 +36,9 @@ class Seqgan(Gan):
         self.test_file = 'save/test_file.txt'
 
     def init_metric(self):
-
-        # bleu = Bleu(test_text=self.generator_file, real_text=self.oracle_file)
-        # self.add_metric(bleu)
+        from utils.metrics.Bleu import Bleu
+        bleu = Bleu(test_text=self.generator_file, real_text=self.oracle_file)
+        self.add_metric(bleu)
 
         self.generator.set_similarity()
         self.oracle.set_similarity()
@@ -122,7 +122,7 @@ class Seqgan(Gan):
             start = time()
             loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -150,7 +150,7 @@ class Seqgan(Gan):
                 _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
             end = time()
             self.add_epoch()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                 self.evaluate()
@@ -220,7 +220,7 @@ class Seqgan(Gan):
             start = time()
             loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -249,7 +249,7 @@ class Seqgan(Gan):
                 _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
             end = time()
             self.add_epoch()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                 get_cfg_test_file()
@@ -319,7 +319,7 @@ class Seqgan(Gan):
             start = time()
             loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -348,7 +348,7 @@ class Seqgan(Gan):
                 _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
             end = time()
             self.add_epoch()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                 get_real_test_file()
@@ -362,5 +362,5 @@ class Seqgan(Gan):
 if __name__ == '__main__':
     seqgan = Seqgan()
     # seqgan.train_oracle()
-    # seqgan.train_cfg()
-    seqgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/toy.txt')
+    seqgan.train_cfg()
+    # seqgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/toy.txt')

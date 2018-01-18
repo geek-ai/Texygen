@@ -72,6 +72,10 @@ class TextganMmd(Gan):
         inll.set_name('i-nll')
         self.add_metric(inll)
 
+        from utils.metrics.DocEmbSim import DocEmbSim
+        docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file, num_vocabulary=self.vocab_size)
+        self.add_metric(docsim)
+
     def train_discriminator(self):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.dis_data_loader.load_train_data(self.oracle_file, self.generator_file)
@@ -97,8 +101,8 @@ class TextganMmd(Gan):
         return super().evaluate()
 
     def train_oracle(self):
-        self.init_metric()
         self.init_oracle_trainng()
+        self.init_metric()
         self.sess.run(tf.global_variables_initializer())
 
         self.pre_epoch_num = 80
@@ -114,7 +118,7 @@ class TextganMmd(Gan):
             start = time()
             loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             if epoch % 5 == 0:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                 self.evaluate()
@@ -149,7 +153,7 @@ class TextganMmd(Gan):
                 }
                 _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -212,7 +216,7 @@ class TextganMmd(Gan):
         self.init_cfg_metric(grammar=cfg_grammar)
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 80
+        self.pre_epoch_num = 1
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-textgan-cfg.csv', 'w')
         oracle_code = generate_samples(self.sess, self.generator, self.batch_size, self.generate_num,
@@ -224,7 +228,7 @@ class TextganMmd(Gan):
             start = time()
             loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -259,7 +263,7 @@ class TextganMmd(Gan):
                 _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
             end = time()
             self.add_epoch()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                 get_cfg_test_file()
@@ -339,7 +343,7 @@ class TextganMmd(Gan):
             start = time()
             loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             if epoch % 5 == 0:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                 get_real_test_file()
@@ -372,7 +376,7 @@ class TextganMmd(Gan):
                 }
                 _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(start - end))
+            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -386,4 +390,4 @@ if __name__ == '__main__':
     textgan = TextganMmd()
     # textgan.train_oracle()
     textgan.train_cfg()
-    textgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/shi.txt')
+    # textgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/shi.txt')
