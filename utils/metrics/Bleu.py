@@ -22,6 +22,7 @@ class Bleu(Metrics):
         return self.name
 
     def get_score(self, is_fast=True):
+        return 0
         if self.is_first:
             self.get_reference()
             self.is_first = False

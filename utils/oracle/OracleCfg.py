@@ -1,4 +1,5 @@
 import json
+import random
 
 from nltk import CFG
 from nltk.parse.generate import generate
@@ -59,10 +60,19 @@ class OracleCfg:
     def generate_sentence(self, depth=9, num=30000):
         if num > 30000:
             num = 30000
-        sentences = generate(self.grammar, depth=depth, n=num)
+        num_ = None
+        sentences = generate(self.grammar, depth=depth, n=num_)
+        sentences_list = list()
+        for s in sentences:
+            # file.write(' '.join(s) + '\n')
+            sentences_list.append(' '.join(s) + '\n')
+        sentences_list = sentences_list[0:num]
+        random.shuffle(sentences_list)
         with open(self.origin_file, 'w') as file:
-            for s in sentences:
-                file.write(' '.join(s) + '\n')
+            for s in sentences_list:
+                file.write(s)
+
+
 
     def pre_process(self):
         tokens = get_tokenlized(self.origin_file)

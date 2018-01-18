@@ -1,12 +1,14 @@
-from models.seqgan.Seqgan import Seqgan
+from models.gsgan.Gsgan import Gsgan
 
 if __name__ == '__main__':
     # gans = []
 
-    seqgan = Seqgan()
+    gan = Gsgan()
     # seqgan.train_oracle()
-    seqgan.generate_num = 10000
-    seqgan.train_real('data/shi.txt')
+    gan.generate_num = 10000
+    gan.vocab_size = 5000
+    gan.train_oracle()
+    # gan.train_real('data/shi.txt')
     # maligan = Maligan()
     # # maligan.train_oracle()
     # textganbasic = TextganBasic()
