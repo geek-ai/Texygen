@@ -130,7 +130,7 @@ class Gsgan(Gan):
         self.init_metric()
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 80
+        self.pre_epoch_num = 0
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-gsgan.csv', 'w')
         generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
@@ -215,12 +215,14 @@ class Gsgan(Gan):
 
     def train_cfg(self):
         cfg_grammar = """
-          S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x | '(' S ')'
-          PLUS -> '+'
-          SUB -> '-'
-          PROD -> '*'
-          DIV -> '/'
-          x -> 'x' | 'y'
+            S -> NP VP
+            VP -> V NP | V NP PP
+            PP -> P NP
+            V -> "saw" | "ate" | "walked"
+            NP -> "john" | "mary" | "bob" | Det N | Det N PP
+            Det -> "a" | "an" | "the" | "my"
+            N -> "man" | "dog" | "cat" | "telescope" | "park"
+            P -> "in" | "on" | "by" | "with"
         """
 
         wi_dict_loc, iw_dict_loc = self.init_cfg_training(cfg_grammar)
@@ -236,7 +238,7 @@ class Gsgan(Gan):
         self.init_cfg_metric(grammar=cfg_grammar)
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 10
+        self.pre_epoch_num = 0
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-gsgan-cfg.csv', 'w')
         # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
@@ -330,7 +332,7 @@ class Gsgan(Gan):
 
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 80
+        self.pre_epoch_num = 0
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-gsgan-real.csv', 'w')
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)

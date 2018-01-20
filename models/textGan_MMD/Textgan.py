@@ -4,12 +4,35 @@ from models.Gan import Gan
 from models.textGan_MMD.TextganDataLoader import DataLoader, DisDataloader
 from models.textGan_MMD.TextganDiscriminator import Discriminator
 from models.textGan_MMD.TextganGenerator import Generator
-from models.textGan_MMD.TextganReward import Reward
+# from models.textGan_MMD.TextganReward import Reward
 from utils.metrics.Bleu import Bleu
 from utils.metrics.EmbSim import EmbSim
 from utils.metrics.Nll import Nll
 from utils.oracle.OracleLstm import OracleLstm
 from utils.utils import *
+
+
+def generate_samples(sess, trainable_model, batch_size, generated_num, output_file=None, get_code=True):
+    # Generate Samples
+    generated_samples = []
+    for _ in range(int(generated_num / batch_size)):
+        generated_samples.extend(trainable_model.generate(sess))
+
+    codes = list()
+    if output_file is not None:
+        with open(output_file, 'w') as fout:
+            for poem in generated_samples:
+                buffer = ' '.join([str(x) for x in poem]) + '\n'
+                fout.write(buffer)
+                if get_code:
+                    codes.append(poem)
+        return np.array(codes)
+
+    codes = ""
+    for poem in generated_samples:
+        buffer = ' '.join([str(x) for x in poem]) + '\n'
+        codes += buffer
+    return codes
 
 
 class TextganMmd(Gan):
@@ -39,15 +62,16 @@ class TextganMmd(Gan):
                                 start_token=self.start_token)
         self.set_oracle(oracle)
 
-        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
-                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,
-                              start_token=self.start_token)
-        self.set_generator(generator)
-
+        g_embeddings = tf.Variable(tf.random_normal(shape=[self.vocab_size, self.emb_dim], stddev=0.1))
         discriminator = Discriminator(sequence_length=self.sequence_length, num_classes=2, vocab_size=self.vocab_size,
                                       emd_dim=self.emb_dim, filter_sizes=self.filter_size, num_filters=self.num_filters,
+                                      batch_size=self.batch_size, g_embeddings=g_embeddings,
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
+        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
+                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,
+                              g_embeddings=g_embeddings, discriminator=discriminator, start_token=self.start_token)
+        self.set_generator(generator)
 
         gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
         oracle_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
@@ -73,20 +97,39 @@ class TextganMmd(Gan):
         self.add_metric(inll)
 
         from utils.metrics.DocEmbSim import DocEmbSim
-        docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file, num_vocabulary=self.vocab_size)
+        docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file,
+                           num_vocabulary=self.vocab_size)
         self.add_metric(docsim)
 
     def train_discriminator(self):
-        generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
-        self.dis_data_loader.load_train_data(self.oracle_file, self.generator_file)
+        # generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
+        # self.dis_data_loader.load_train_data(self.oracle_file, self.generator_file)
         for _ in range(3):
-            self.dis_data_loader.next_batch()
-            x_batch, y_batch = self.dis_data_loader.next_batch()
+            # self.dis_data_loader.next_batch()
+            # x_batch, y_batch = self.dis_data_loader.next_batch()
+            x_batch, z_h = self.generator.generate(self.sess, True)
+            y_batch = self.gen_data_loader.next_batch()
             feed = {
                 self.discriminator.input_x: x_batch,
                 self.discriminator.input_y: y_batch,
+                self.discriminator.zh: z_h,
+                self.discriminator.input_x_lable: [[1, 0] for _ in x_batch],
+                self.discriminator.input_y_lable: [[0, 1] for _ in y_batch],
             }
             _ = self.sess.run(self.discriminator.train_op, feed)
+
+    def train_generator(self):
+        z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
+        z_c0 = np.zeros(shape=[self.batch_size, self.emb_dim])
+
+        y_batch = self.gen_data_loader.next_batch()
+        feed = {
+            self.generator.h_0: z_h0,
+            self.generator.c_0: z_c0,
+            self.generator.y: y_batch,
+        }
+        _ = self.sess.run(fetches=self.generator.g_updates, feed_dict=feed)
+        pass
 
     def evaluate(self):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -131,27 +174,13 @@ class TextganMmd(Gan):
             self.train_discriminator()
 
         self.reset_epoch()
-        self.reward = Reward()
-
-        self.reward.set_vec_real(sess=self.sess, input_x=oracle_code, discriminator=self.discriminator)
         del oracle_code
         print('adversarial training:')
         for epoch in range(self.adversarial_epoch_num):
             print('epoch:' + str(epoch))
             start = time()
             for index in range(100):
-                samples = self.generator.generate(self.sess)
-                rewards = self.reward.get_reward(self.sess, samples, self.discriminator)
-                z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
-                z_c0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
-
-                feed = {
-                    self.generator.x: samples,
-                    self.generator.rewards: rewards,
-                    self.generator.h_0: z_h0,
-                    self.generator.c_0: z_c0,
-                }
-                _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
+                self.train_generator()
             end = time()
             print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             self.add_epoch()
@@ -168,16 +197,16 @@ class TextganMmd(Gan):
         self.set_oracle(oracle)
         self.oracle.generate_oracle()
         self.vocab_size = self.oracle.vocab_size + 1
-
-        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
-                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,
-                              start_token=self.start_token)
-        self.set_generator(generator)
-
+        g_embeddings = tf.Variable(tf.random_normal(shape=[self.vocab_size, self.emb_dim], stddev=0.1))
         discriminator = Discriminator(sequence_length=self.sequence_length, num_classes=2, vocab_size=self.vocab_size,
                                       emd_dim=self.emb_dim, filter_sizes=self.filter_size, num_filters=self.num_filters,
+                                      batch_size=self.batch_size, g_embeddings=g_embeddings,
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
+        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
+                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,
+                              g_embeddings=g_embeddings, discriminator=discriminator, start_token=self.start_token)
+        self.set_generator(generator)
 
         gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
         oracle_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
@@ -216,7 +245,7 @@ class TextganMmd(Gan):
         self.init_cfg_metric(grammar=cfg_grammar)
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 1
+        self.pre_epoch_num = 10
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-textgan-cfg.csv', 'w')
         oracle_code = generate_samples(self.sess, self.generator, self.batch_size, self.generate_num,
@@ -243,24 +272,13 @@ class TextganMmd(Gan):
 
         self.reset_epoch()
         print('adversarial training:')
-        self.reward = Reward()
-        self.reward.set_vec_real(sess=self.sess, input_x=oracle_code, discriminator=self.discriminator)
+
         del oracle_code
         for epoch in range(self.adversarial_epoch_num):
             print('epoch:' + str(epoch))
             start = time()
-            for index in range(100):
-                samples = self.generator.generate(self.sess)
-                rewards = self.reward.get_reward(self.sess, samples, self.discriminator)
-                z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
-                z_c0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
-                feed = {
-                    self.generator.x: samples,
-                    self.generator.rewards: rewards,
-                    self.generator.h_0: z_h0,
-                    self.generator.c_0: z_c0,
-                }
-                _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
+            for i in range(100):
+                self.train_generator()
             end = time()
             self.add_epoch()
             print('epoch:' + str(epoch) + '\t time:' + str(end - start))
@@ -281,15 +299,16 @@ class TextganMmd(Gan):
             data_loc = '../../data/image_coco.txt'
         self.sequence_length, self.vocab_size = text_precess(data_loc)
 
-        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
-                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,
-                              start_token=self.start_token)
-        self.set_generator(generator)
-
+        g_embeddings = tf.Variable(tf.random_normal(shape=[self.vocab_size, self.emb_dim], stddev=0.1))
         discriminator = Discriminator(sequence_length=self.sequence_length, num_classes=2, vocab_size=self.vocab_size,
                                       emd_dim=self.emb_dim, filter_sizes=self.filter_size, num_filters=self.num_filters,
+                                      batch_size=self.batch_size, g_embeddings=g_embeddings,
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
+        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
+                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,
+                              g_embeddings=g_embeddings, discriminator=discriminator, start_token=self.start_token)
+        self.set_generator(generator)
 
         gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
         oracle_dataloader = None
@@ -356,25 +375,14 @@ class TextganMmd(Gan):
             print('epoch:' + str(epoch))
             self.train_discriminator()
         oracle_code = get_real_code()
-        self.reward.set_vec_real(sess=self.sess, input_x=oracle_code, discriminator=self.discriminator)
+
 
         print('adversarial training:')
         for epoch in range(self.adversarial_epoch_num):
             print('epoch:' + str(epoch))
             start = time()
             for index in range(100):
-                samples = self.generator.generate(self.sess)
-                rewards = self.reward.get_reward(self.sess, samples, self.discriminator)
-                z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
-                z_c0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
-
-                feed = {
-                    self.generator.x: samples,
-                    self.generator.rewards: rewards,
-                    self.generator.h_0: z_h0,
-                    self.generator.c_0: z_c0,
-                }
-                _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
+                self.train_generator()
             end = time()
             print('epoch:' + str(epoch) + '\t time:' + str(end - start))
             self.add_epoch()

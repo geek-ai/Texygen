@@ -66,7 +66,8 @@ class Seqgan(Gan):
                 self.discriminator.input_x: x_batch,
                 self.discriminator.input_y: y_batch,
             }
-            _ = self.sess.run(self.discriminator.train_op, feed)
+            loss,_ = self.sess.run([self.discriminator.d_loss, self.discriminator.train_op], feed)
+            # print(loss)
 
     def evaluate(self):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -187,12 +188,14 @@ class Seqgan(Gan):
 
     def train_cfg(self):
         cfg_grammar = """
-          S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x | '(' S ')'
-          PLUS -> '+'
-          SUB -> '-'
-          PROD -> '*'
-          DIV -> '/'
-          x -> 'x' | 'y'
+            S -> NP VP
+            VP -> V NP | V NP PP
+            PP -> P NP
+            V -> "saw" | "ate" | "walked"
+            NP -> "john" | "mary" | "bob" | Det N | Det N PP
+            Det -> "a" | "an" | "the" | "my"
+            N -> "man" | "dog" | "cat" | "telescope" | "park"
+            P -> "in" | "on" | "by" | "with"
         """
 
         wi_dict_loc, iw_dict_loc = self.init_cfg_training(cfg_grammar)
@@ -208,7 +211,7 @@ class Seqgan(Gan):
         self.init_cfg_metric(grammar=cfg_grammar)
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 80
+        self.pre_epoch_num = 1
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-seqgan-cfg.csv', 'w')
         # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
@@ -246,7 +249,8 @@ class Seqgan(Gan):
                     self.generator.x: samples,
                     self.generator.rewards: rewards
                 }
-                _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
+                loss, _ = self.sess.run([self.generator.g_loss, self.generator.g_updates], feed_dict=feed)
+                print(loss)
             end = time()
             self.add_epoch()
             print('epoch:' + str(epoch) + '\t time:' + str(end - start))
@@ -345,7 +349,8 @@ class Seqgan(Gan):
                     self.generator.x: samples,
                     self.generator.rewards: rewards
                 }
-                _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
+                loss, _ = self.sess.run([self.generator.g_loss, self.generator.g_updates], feed_dict=feed)
+                print(loss)
             end = time()
             self.add_epoch()
             print('epoch:' + str(epoch) + '\t time:' + str(end - start))

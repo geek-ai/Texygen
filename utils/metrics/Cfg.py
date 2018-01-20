@@ -31,7 +31,9 @@ class Cfg(Metrics):
                     continue
                 else:
                     total_num += 1
-                    s = "".join(s.split())
+                    # s = "".join(s.split())
+                    # s = ['a','a']
+                    s = nltk.word_tokenize(s)
                     for _ in self.parser.parse(s):
                         valid_num += 1
                         break

@@ -78,8 +78,6 @@ class Generator(object):
         self.gen_x = tf.transpose(self.gen_x, perm=[1, 0])  # batch_size x seq_length
 
         self.gen_ot = self.gen_ot.stack()
-        # fixme!!
-
         self.gen_ot = tf.transpose(self.gen_ot, perm=[1, 0, 2]) #  batch_size x seq_length x num_vocabulary
 
         # todo
@@ -128,14 +126,7 @@ class Generator(object):
         #######################################################################################################
         #  Unsupervised Training
         #######################################################################################################
-        pass
-        # feed_d = {
-        #     self.discriminator.h_0: self.h_0,
-        #     self.discriminator.c_0: self.c_0,
-        #     self.discriminator.input_x: self.gen_ot,
-        #     self.discriminator.input_y: np.zeros(shape=[batch_size, 2])
-        # }
-        # d_pred = self.sess.run(self.discriminator.score, feed_d)
+
         d_pred = self.discriminator.predict(self.gen_ot)
         neg_score = tf.slice(tf.reshape(d_pred, shape=[2,batch_size]), [0, 0], [1, batch_size])
         self.g_loss = tf.negative(tf.divide(tf.divide(neg_score, tf.subtract(1.0, neg_score)), batch_size))

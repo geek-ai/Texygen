@@ -60,13 +60,26 @@ class OracleCfg:
     def generate_sentence(self, depth=9, num=30000):
         if num > 30000:
             num = 30000
-        num_ = None
-        sentences = generate(self.grammar, depth=depth, n=num_)
+        gen_num = 0
+        done = False
         sentences_list = list()
-        for s in sentences:
-            # file.write(' '.join(s) + '\n')
-            sentences_list.append(' '.join(s) + '\n')
-        sentences_list = sentences_list[0:num]
+
+        for dep in range(1, depth):
+            sentences = generate(self.grammar, depth=dep)
+            for s in sentences:
+                sentences_list.append(' '.join(s) + '\n')
+                gen_num += 1
+                if gen_num > num:
+                    done = True
+                    break
+            if done:
+                break
+
+        # sentences = generate(self.grammar, depth=depth, n=4)
+        # for s in sentences:
+        #     # file.write(' '.join(s) + '\n')
+        #     sentences_list.append(' '.join(s) + '\n')
+        # sentences_list = sentences_list[0:num]
         random.shuffle(sentences_list)
         with open(self.origin_file, 'w') as file:
             for s in sentences_list:

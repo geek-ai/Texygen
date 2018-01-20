@@ -150,6 +150,12 @@ class Leakgan(Gan):
         generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         if self.oracle_data_loader is not None:
             self.oracle_data_loader.create_batches(self.generator_file)
+        if self.log is not None:
+            scores = super().evaluate()
+            for score in scores:
+                self.log.write(str(score) + ',')
+            self.log.write('\n')
+            return scores
         return super().evaluate()
 
     def train_oracle(self):
@@ -159,7 +165,7 @@ class Leakgan(Gan):
 
         self.pre_epoch_num = 80
         self.adversarial_epoch_num = 100
-        log = open('experiment-log-leakgan.csv', 'w')
+        self.log = open('experiment-log-leakgan.csv', 'w')
         generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.gen_data_loader.create_batches(self.oracle_file)
@@ -293,7 +299,7 @@ class Leakgan(Gan):
 
         self.pre_epoch_num = 80
         self.adversarial_epoch_num = 100
-        self.log = open('experiment-log-textganbasic-cfg.csv', 'w')
+        self.log = open('experiment-log-leakganbasic-cfg.csv', 'w')
         # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.gen_data_loader.create_batches(self.oracle_file)
@@ -418,7 +424,7 @@ class Leakgan(Gan):
 
         self.pre_epoch_num = 80
         self.adversarial_epoch_num = 100
-        self.log = open('experiment-log-rankgan-real.csv', 'w')
+        self.log = open('experiment-log-leakgan-real.csv', 'w')
         generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.gen_data_loader.create_batches(self.oracle_file)
 
