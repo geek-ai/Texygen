@@ -44,10 +44,10 @@ on original dataset:
 on test dataset:
 // calculating...
 
-Model Collapse:
+Mode Collapse:
 
 
-| type\\fold | seqGAN | maliGAN | rankGAN | leakGAN | original data |
+|            | seqGAN | maliGAN | rankGAN | leakGAN | original data |
 |------------|--------|---------|---------|---------|---------------|
 | BLEU2      | 0.950  | 0.918   | 0.959   | 0.966   | 0.892         |
 | BLEU3      | 0.840  | 0.781   | 0.882   | 0.913   | 0.747         |
