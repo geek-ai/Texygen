@@ -5,7 +5,6 @@ from models.Gan import Gan
 from models.gsgan.GsganDataLoader import DataLoader, DisDataloader
 from models.gsgan.GsganDiscriminator import Discriminator
 from models.gsgan.GsganGenerator import Generator
-from models.gsgan.GsganReward import Reward
 from utils.metrics.Bleu import Bleu
 from utils.metrics.Cfg import Cfg
 from utils.metrics.EmbSim import EmbSim
@@ -158,23 +157,11 @@ class Gsgan(Gan):
 
         self.reset_epoch()
         print('adversarial training:')
-        self.reward = Reward()
         for epoch in range(self.adversarial_epoch_num):
             print('epoch:' + str(epoch))
             start = time()
-            for index in range(1):
-                samples = self.generator.generate(self.sess)
-                rewards = self.reward.get_reward(self.sess, samples, 16, self.discriminator)
-                z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
-                z_c0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
-
-                feed = {
-                    self.generator.x: samples,
-                    self.generator.rewards: rewards,
-                    self.generator.h_0: z_h0,
-                    self.generator.c_0: z_c0,
-                }
-                _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
+            for index in range(10):
+                self.generator.unsupervised_train(self.sess)
             end = time()
             self.add_epoch()
             print('epoch:' + str(epoch) + '\t time:' + str(end - start))
@@ -265,7 +252,6 @@ class Gsgan(Gan):
 
         self.reset_epoch()
         print('adversarial training:')
-        self.reward = Reward()
         for epoch in range(self.adversarial_epoch_num):
             print('epoch:' + str(epoch))
             start = time()
@@ -358,7 +344,6 @@ class Gsgan(Gan):
 
         self.reset_epoch()
         print('adversarial training:')
-        self.reward = Reward()
         for epoch in range(self.adversarial_epoch_num):
             print('epoch:' + str(epoch))
             start = time()

@@ -242,14 +242,16 @@ class Discriminator(object):
 
             # CalculateMean cross-entropy loss
             with tf.name_scope("loss"):
-                gan_loss = tf.nn.softmax_cross_entropy_with_logits(logits=scores, labels=input_label)
-
+                batch_num = input_label.get_shape()[0]
+                pos_score = tf.slice(scores, begin=[0, 0], size=[batch_num, 1])
+                pos_label = tf.slice(input_label, begin=[0, 0], size=[batch_num,1])
+                gan_loss = tf.log(tf.norm(pos_score - pos_label, ord=1))
                 x_feature = self.feature(input_x=self.input_x, name='x')
                 y_feature = self.feature(input_x=self.input_y, name='y')
                 mmd_loss = calc_mmd(x_feature, y_feature)
 
                 z_hat = tf.matmul(x_feature, self.Wzh)
-                recon_loss = - tf.norm(tf.subtract(z_hat, self.zh), axis=1)
+                recon_loss = - tf.square(tf.norm(tf.subtract(z_hat, self.zh), axis=1))
                 self.loss = tf.reduce_mean(gan_loss) + l2_reg_lambda * l2_loss + 0.1 * mmd_loss + 0.1 * recon_loss
 
         self.params = [param for param in tf.trainable_variables() if 'discriminator' in param.name]
@@ -298,11 +300,12 @@ class Discriminator(object):
         num_filters_total = sum(self.num_filters)
         h_pool = tf.concat(pooled_outputs, 3)
         h_pool_flat = tf.reshape(h_pool, [-1, num_filters_total])
-
-        # Add highway
-        with tf.name_scope("highway" + name):
-            h_highway = highway(h_pool_flat, h_pool_flat.get_shape()[1], 1, )
-        return h_highway
+        return h_pool_flat
+        #
+        # # Add highway
+        # with tf.name_scope("highway" + name):
+        #     h_highway = highway(h_pool_flat, h_pool_flat.get_shape()[1], 1, )
+        # return h_highway
 
     def predict(self, input_x):
         # input_x:  batch_size x seq_length x g_emb_dim

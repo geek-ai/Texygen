@@ -97,11 +97,8 @@ class Generator(object):
         def _pretrain_recurrence(i, x_t, h_tm1, g_predictions):
             h_t = self.g_recurrent_unit(x_t, h_tm1)
             o_t = self.g_output_unit(h_t)
-            # hv = o_t
-            # next_token = tf.cast(tf.argmax(o_t, axis=1), tf.int32)
-            x_tp1 = tf.matmul(tf.nn.softmax(tf.multiply(o_t, 1e3)), self.g_embeddings)
             g_predictions = g_predictions.write(i, tf.nn.softmax(o_t))  # batch x vocab_size
-            # x_tp1 = ta_emb_x.read(i)
+            x_tp1 = ta_emb_x.read(i)
             return i + 1, x_tp1, h_t, g_predictions
 
         _, _, _, self.g_predictions = control_flow_ops.while_loop(
@@ -233,7 +230,8 @@ class Generator(object):
         self.g_updates = g_opt.apply_gradients(zip(self.g_grad, self.g_params))
 
     def generate(self, sess, get_z = False):
-        z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
+        z_h0 = np.random.uniform(low=-.01, high=1, size=[self.batch_size, self.emb_dim])
+        # z_h0 = np.zeros(shape=[self.batch_size, self.emb_dim])
         z_c0 = np.zeros(shape=[self.batch_size, self.emb_dim])
         feed = {
             self.h_0: z_h0,
@@ -245,7 +243,7 @@ class Generator(object):
         return outputs, z_h0
 
     def get_nll(self, sess, batch):
-        z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
+        z_h0 = np.random.uniform(low=-.01, high=.01, size=[self.batch_size, self.emb_dim])
         z_c0 = np.zeros(shape=[self.batch_size, self.emb_dim])
         feed = {
             self.h_0: z_h0,

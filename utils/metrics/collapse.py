@@ -7,12 +7,12 @@ from nltk.translate.bleu_score import SmoothingFunction
 from utils.metrics.Metrics import Metrics
 
 
-class Bleu(Metrics):
-    def __init__(self, test_text='', real_text='', gram=3):
+class collapse(Metrics):
+    def __init__(self, test_text='', gram=3):
         super().__init__()
-        self.name = 'Bleu'
+        self.name = 'collapse'
         self.test_data = test_text
-        self.real_data = real_text
+        # self.real_data = real_text
         self.gram = gram
         self.sample_size = 500
         self.reference = None
@@ -34,7 +34,7 @@ class Bleu(Metrics):
     def get_reference(self):
         if self.reference is None:
             reference = list()
-            with open(self.real_data) as real_data:
+            with open(self.test_data) as real_data:
                 for text in real_data:
                     text = nltk.word_tokenize(text)
                     reference.append(text)
@@ -72,10 +72,16 @@ class Bleu(Metrics):
         weight = tuple((1. / ngram for _ in range(ngram)))
         pool = Pool(os.cpu_count())
         result = list()
-        with open(self.test_data) as test_data:
-            for hypothesis in test_data:
-                hypothesis = nltk.word_tokenize(hypothesis)
-                result.append(pool.apply_async(self.calc_bleu, args=(reference, hypothesis, weight)))
+        sentence_num = len(reference)
+        for index in range(sentence_num):
+            hypothesis = reference[index]
+            other = reference[:index] + reference[index+1:]
+            result.append(pool.apply_async(self.calc_bleu, args=(other, hypothesis, weight)))
+        #
+        # with open(self.test_data) as test_data:
+        #     for hypothesis in test_data:
+        #         hypothesis = nltk.word_tokenize(hypothesis)
+        #         result.append(pool.apply_async(self.calc_bleu, args=(reference, hypothesis, weight)))
         score = 0.0
         cnt = 0
         for i in result:

@@ -198,8 +198,8 @@ class Leakgan(Gan):
         for epoch in range(self.adversarial_epoch_num//10):
             for epoch_ in range(10):
                 print('epoch:' + str(epoch) + '--' + str(epoch_))
-                start = time()
                 for index in range(1):
+                    start = time()
                     samples = self.generator.generate(self.sess, 1)
                     rewards = self.reward.get_reward(samples)
                     feed = {
@@ -211,12 +211,14 @@ class Leakgan(Gan):
                         [self.generator.manager_updates, self.generator.worker_updates, self.generator.goal_loss,
                          self.generator.worker_loss, ], feed_dict=feed)
                     print('epoch', str(epoch), 'g_loss', g_loss, 'w_loss', w_loss)
-                end = time()
-                self.add_epoch()
-                print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(end - start))
-                if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
-                    generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
-                    self.evaluate()
+                    end = time()
+                    print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(end - start))
+                    if self.epoch % 5 == 0 or self.epoch == self.adversarial_epoch_num - 1:
+                        generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num,
+                                             self.generator_file)
+                        self.evaluate()
+                    self.add_epoch()
+
 
                 for _ in range(15):
                     self.train_discriminator()
@@ -229,7 +231,7 @@ class Leakgan(Gan):
                 if epoch % 5 == 0:
                     generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num,
                                          self.generator_file)
-                    self.evaluate()
+                    # self.evaluate()
             for epoch_ in range(5):
                 print('epoch:' + str(epoch) + '--' + str(epoch_))
                 self.train_discriminator()

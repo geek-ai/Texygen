@@ -1,9 +1,8 @@
 from time import time
 
 from models.Gan import Gan
-from models.pg_cfg.PgcfgDataLoader import DataLoader
-from models.pg_cfg.PgcfgGenerator import Generator
-from models.pg_cfg.PgcfgReward import Reward
+from models.mle.MleDataLoader import DataLoader
+from models.mle.MleGenerator import Generator
 from utils.metrics.Bleu import Bleu
 from utils.metrics.EmbSim import EmbSim
 from utils.metrics.Nll import Nll
@@ -11,7 +10,7 @@ from utils.oracle.OracleLstm import OracleLstm
 from utils.utils import *
 
 
-class Pgbleu(Gan):
+class Mle(Gan):
     def __init__(self, oracle=None):
         super().__init__()
         # you can change parameters, generator here
@@ -29,7 +28,9 @@ class Pgbleu(Gan):
 
         self.oracle_file = 'save/oracle.txt'
         self.generator_file = 'save/generator.txt'
+        self.test_file = 'save/test_file.txt'
 
+    def init_oracle_trainng(self, oracle=None):
         if oracle is None:
             oracle = OracleLstm(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
                                 hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,
@@ -82,7 +83,8 @@ class Pgbleu(Gan):
 
     def evaluate(self):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
-        self.oracle_data_loader.create_batches(self.generator_file)
+        if self.oracle_data_loader is not None:
+            self.oracle_data_loader.create_batches(self.generator_file)
         if self.log is not None:
             scores = super().evaluate()
             for score in scores:
@@ -92,18 +94,17 @@ class Pgbleu(Gan):
         return super().evaluate()
 
     def train_oracle(self):
+        self.init_oracle_trainng()
         self.sess.run(tf.global_variables_initializer())
 
         self.pre_epoch_num = 80
-        self.adversarial_epoch_num = 100
-        self.log = open('experiment-log-pgbleu3.csv', 'w')
+        self.log = open('experiment-log-mle.csv', 'w')
         generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)
         self.init_metric()
 
-        # rollout = Reward(generator, update_rate)
         print('start pre-train generator:')
         for epoch in range(self.pre_epoch_num):
             start = time()
@@ -113,28 +114,66 @@ class Pgbleu(Gan):
             if epoch % 5 == 0:
                 self.evaluate()
             self.add_epoch()
+        generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
+        return
 
-        self.reset_epoch()
-        print('start pg-bleu training:')
-        self.reward = Reward(self.oracle_file)
-        for epoch in range(self.adversarial_epoch_num):
+
+    def init_real_trainng(self, data_loc=None):
+        from utils.text_process import text_precess, text_to_code
+        from utils.text_process import get_tokenlized, get_word_list, get_dict
+        if data_loc is None:
+            data_loc = '../../data/image_coco.txt'
+        self.sequence_length, self.vocab_size = text_precess(data_loc)
+        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
+                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,
+                              start_token=self.start_token)
+        self.set_generator(generator)
+
+        gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
+        oracle_dataloader = None
+        dis_dataloader = None
+
+        self.set_data_loader(gen_loader=gen_dataloader, dis_loader=dis_dataloader, oracle_loader=oracle_dataloader)
+        tokens = get_tokenlized(data_loc)
+        word_set = get_word_list(tokens)
+        [word_index_dict, index_word_dict] = get_dict(word_set)
+        with open(self.oracle_file, 'w') as outfile:
+            outfile.write(text_to_code(tokens, word_index_dict, self.sequence_length))
+        return word_index_dict, index_word_dict
+
+    def train_real(self, data_loc=None):
+        from utils.text_process import code_to_text
+        from utils.text_process import get_tokenlized
+        wi_dict, iw_dict = self.init_real_trainng(data_loc)
+
+        def get_real_test_file(dict=iw_dict):
+            with open(self.generator_file, 'r') as file:
+                codes = get_tokenlized(self.generator_file)
+            with open(self.test_file, 'w') as outfile:
+                outfile.write(code_to_text(codes=codes, dictionary=dict))
+
+        self.sess.run(tf.global_variables_initializer())
+
+        self.pre_epoch_num = 80
+        self.adversarial_epoch_num = 100
+        self.log = open('experiment-log-mle-real.csv', 'w')
+        generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
+        self.gen_data_loader.create_batches(self.oracle_file)
+
+        print('start pre-train generator:')
+        for epoch in range(self.pre_epoch_num):
             start = time()
-            print('epoch:' + str(epoch))
-            for index in range(10):
-                samples = self.generator.generate(self.sess)
-                rewards = self.reward.get_reward(samples)
-                feed = {
-                    self.generator.x: samples,
-                    self.generator.rewards: rewards
-                }
-                _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
+            loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            self.add_epoch()
             print('epoch:' + str(epoch) + '\t time:' + str(end - start))
-            if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
+            self.add_epoch()
+            if epoch % 5 == 0:
+                generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
+                get_real_test_file()
                 self.evaluate()
+        generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
 
 
 if __name__ == '__main__':
-    pgbleu = Pgbleu()
+    pgbleu = Mle()
     pgbleu.train_oracle()

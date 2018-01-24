@@ -4,7 +4,6 @@ from models.Gan import Gan
 from models.textGan_MMD.TextganDataLoader import DataLoader, DisDataloader
 from models.textGan_MMD.TextganDiscriminator import Discriminator
 from models.textGan_MMD.TextganGenerator import Generator
-# from models.textGan_MMD.TextganReward import Reward
 from utils.metrics.Bleu import Bleu
 from utils.metrics.EmbSim import EmbSim
 from utils.metrics.Nll import Nll
@@ -119,7 +118,7 @@ class TextganMmd(Gan):
             _ = self.sess.run(self.discriminator.train_op, feed)
 
     def train_generator(self):
-        z_h0 = np.random.uniform(low=-1, high=1, size=[self.batch_size, self.emb_dim])
+        z_h0 = np.random.uniform(low=-.01, high=.01, size=[self.batch_size, self.emb_dim])
         z_c0 = np.zeros(shape=[self.batch_size, self.emb_dim])
 
         y_batch = self.gen_data_loader.next_batch()
@@ -245,7 +244,7 @@ class TextganMmd(Gan):
         self.init_cfg_metric(grammar=cfg_grammar)
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 10
+        self.pre_epoch_num = 80
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-textgan-cfg.csv', 'w')
         oracle_code = generate_samples(self.sess, self.generator, self.batch_size, self.generate_num,
