@@ -48,7 +48,7 @@ class Gsgan(Gan):
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
         # discriminator = None
-        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim, sess=self.sess,
+        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, sess=self.sess,
                               hidden_dim=self.hidden_dim, sequence_length=self.sequence_length, discriminator=discriminator,
                               start_token=self.start_token)
         self.set_generator(generator)
@@ -185,7 +185,7 @@ class Gsgan(Gan):
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
         # discriminator = None
-        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim, sess=self.sess,
+        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, sess=self.sess,
                               hidden_dim=self.hidden_dim, sequence_length=self.sequence_length, discriminator=discriminator,
                               start_token=self.start_token)
         self.set_generator(generator)
@@ -281,7 +281,7 @@ class Gsgan(Gan):
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
         # discriminator = None
-        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim, sess=self.sess,
+        generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, sess=self.sess,
                               hidden_dim=self.hidden_dim, sequence_length=self.sequence_length, discriminator=discriminator,
                               start_token=self.start_token)
         self.set_generator(generator)

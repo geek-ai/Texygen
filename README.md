@@ -1,6 +1,25 @@
-# Evaluation Platform for Text Generation #
+# TexyGen #
 
-###Models and Original Paper:
+TexyGen is a text generation model evaluation platform, which included most poplular GAN models in the text generation area 
+along with some evaluation metric.
+
+It's easy to run and get evaluation results.
+
+## Requirement
+We suggest you run the platform under Python 3.6+ with following libs:
+* **tensorflow==1.3.0**
+* numpy==1.12.1
+* scipy==0.19.0
+* nltk==3.2.3
+* CUDA 7.5+ (Suggested for GPU speed up, not compulsory)    
+
+Or just type `pip install requirements.txt` in your terminal.
+
+## Paper
+
+// TODO
+
+#### Implemented Models and Original Paper:
 
 seqGan--  [SeqGAN: Sequence Generative Adversarial Nets with Policy Gradient](https://arxiv.org/abs/1609.05473)
 
@@ -11,45 +30,21 @@ rankGan-- [Adversarial ranking for language generation](http://papers.nips.cc/pa
 leakGan-- [Long Text Generation via Adversarial Training with Leaked Information](https://arxiv.org/abs/1709.08624)
 
 textGan-- [Adversarial Feature Matching for Text Generation](https://arxiv.org/abs/1706.03850)
- (need discussion)
  
 gsGan-- [GANS for Sequences of Discrete Elements with the Gumbel-softmax Distribution](https://arxiv.org/abs/1611.04051)
 
 
-### Evaluations:
+## Get Started
 
-nll loss on oracle:
-
-![](fig/nll.png)
-
-inverse nll loss on oracle:
-
-![](fig/inll.png)
-
-embedding similarity on image coco:
-
-![](fig/embsim.png)
-
-BLEU:
-
-on original dataset:
-
-|            | seqGAN | maliGAN | rankGAN | leakGAN |
-|------------|--------|---------|---------|---------|
-| BLEU2      | 0.917  | 0.887   | 0.937   | 0.926   |
-| BLEU3      | 0.747  | 0.697   | 0.799   | 0.816   |
-| BLEU4      | 0.530  | 0.482   | 0.601   | 0.660   |
-| BLEU5      | 0.348  | 0.312   | 0.414   | 0.470   |
-
-on test dataset:
-// calculating...
-
-Mode Collapse:
+```bash
+git clone 
+cd apex-text-gen
+# run SeqGAN with default setting
+python3 main.py
+```
+[Document](Doc/doc.md)
 
 
-|            | seqGAN | maliGAN | rankGAN | leakGAN | original data |
-|------------|--------|---------|---------|---------|---------------|
-| BLEU2      | 0.950  | 0.918   | 0.959   | 0.966   | 0.892         |
-| BLEU3      | 0.840  | 0.781   | 0.882   | 0.913   | 0.747         |
-| BLEU4      | 0.670  | 0.606   | 0.762   | 0.848   | 0.573         |
-| BLEU5      | 0.489  | 0.437   | 0.618   | 0.780   | 0.415         |
+## Evaluation Results
+
+[evaluation results](Doc/evaluation.md)

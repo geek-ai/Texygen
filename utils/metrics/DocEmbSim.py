@@ -121,24 +121,14 @@ class DocEmbSim(Metrics):
                 tf.nn.sampled_softmax_loss(weights=softmax_weights, biases=softmax_biases, inputs=embed,
                                            labels=train_labels, num_sampled=num_sampled, num_classes=vocabulary_size))
 
-            # Optimizer.
-            # Note: The optimizer will optimize the softmax_weights AND the embeddings.
-            # This is because the embeddings are defined as a variable quantity and the
-            # optimizer's `minimize` method will by default modify all variable quantities
-            # that contribute to the tensor it is passed.
-            # See docs on `tf.train.Optimizer.minimize()` for more details.
             optimizer = tf.train.AdagradOptimizer(1.0).minimize(loss)
 
             # Compute the similarity between minibatch examples and all embeddings.
-            # We use the cosine distance:
             norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
             normalized_embeddings = embeddings / norm
             valid_embeddings = tf.nn.embedding_lookup(
                 normalized_embeddings, valid_dataset)
             similarity = tf.matmul(valid_embeddings, tf.transpose(normalized_embeddings))
-            # valid_embeddings = tf.nn.embedding_lookup(
-            #     normalized_embeddings, valid_dataset)
-            # similarity = tf.matmul(valid_embeddings, tf.transpose(normalized_embeddings))
 
             data = self.read_data(file)
 
@@ -152,25 +142,9 @@ class DocEmbSim(Metrics):
                 for index in range(generate_num):
                     cur_batch_data, cur_batch_labels = self.generate_batch(
                         batch_size, num_skips, skip_window, data[index])
-                    # batch_data += np.ndarray.tolist(cur_batch_data)
-                    # batch_labels += np.ndarray.tolist(cur_batch_labels)
-                    # batch_data = np.array(batch_data)
-                    # batch_labels = np.array(batch_labels)
                     feed_dict = {train_dataset: cur_batch_data, train_labels: cur_batch_labels}
                     _, l = session.run([optimizer, loss], feed_dict=feed_dict)
                     average_loss += l
-                if step % 2000 == 0:
-                    if step > 0:
-                        average_loss = average_loss / (2000*generate_num)
-                    # The average loss is an estimate of the loss over the last 2000 batches.
-                    print('Average loss at step %d: %f' % (step, average_loss))
-                    average_loss = 0
-                    # if step % 10000 == 0:
-                    #     sim = similarity.eval()
-            # final_embeddings = normalized_embeddings.eval()
-            # norm = np.sqrt(np.sum(np.square(final_embeddings), axis=1, keepdims=True))
-            # normalized_embeddings = np.divide(final_embeddings, norm)
-            # similarity = np.matmul(normalized_embeddings, normalized_embeddings.T)
             similarity_value = similarity.eval()
             return similarity_value
 

@@ -62,9 +62,9 @@ class TextganMmd(Gan):
         self.set_oracle(oracle)
 
         g_embeddings = tf.Variable(tf.random_normal(shape=[self.vocab_size, self.emb_dim], stddev=0.1))
-        discriminator = Discriminator(sequence_length=self.sequence_length, num_classes=2, vocab_size=self.vocab_size,
+        discriminator = Discriminator(sequence_length=self.sequence_length, num_classes=2,
                                       emd_dim=self.emb_dim, filter_sizes=self.filter_size, num_filters=self.num_filters,
-                                      batch_size=self.batch_size, g_embeddings=g_embeddings,
+                                      g_embeddings=g_embeddings,
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
@@ -197,9 +197,9 @@ class TextganMmd(Gan):
         self.oracle.generate_oracle()
         self.vocab_size = self.oracle.vocab_size + 1
         g_embeddings = tf.Variable(tf.random_normal(shape=[self.vocab_size, self.emb_dim], stddev=0.1))
-        discriminator = Discriminator(sequence_length=self.sequence_length, num_classes=2, vocab_size=self.vocab_size,
+        discriminator = Discriminator(sequence_length=self.sequence_length, num_classes=2,
                                       emd_dim=self.emb_dim, filter_sizes=self.filter_size, num_filters=self.num_filters,
-                                      batch_size=self.batch_size, g_embeddings=g_embeddings,
+                                      g_embeddings=g_embeddings,
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
@@ -299,9 +299,9 @@ class TextganMmd(Gan):
         self.sequence_length, self.vocab_size = text_precess(data_loc)
 
         g_embeddings = tf.Variable(tf.random_normal(shape=[self.vocab_size, self.emb_dim], stddev=0.1))
-        discriminator = Discriminator(sequence_length=self.sequence_length, num_classes=2, vocab_size=self.vocab_size,
+        discriminator = Discriminator(sequence_length=self.sequence_length, num_classes=2,
                                       emd_dim=self.emb_dim, filter_sizes=self.filter_size, num_filters=self.num_filters,
-                                      batch_size=self.batch_size, g_embeddings=g_embeddings,
+                                      g_embeddings=g_embeddings,
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,

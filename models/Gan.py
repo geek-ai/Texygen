@@ -74,3 +74,6 @@ class Gan:
 
     def train_cfg(self):
         pass
+
+    def train_real(self):
+        pass

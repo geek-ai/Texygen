@@ -24,7 +24,8 @@ class Generator(object):
         self.expected_reward = tf.Variable(tf.zeros([self.sequence_length]))
 
         with tf.variable_scope('generator'):
-            self.g_embeddings = tf.Variable(self.init_matrix([self.num_vocabulary, self.emb_dim]))
+            # self.g_embeddings = tf.Variable(self.init_matrix([self.num_vocabulary, self.emb_dim]))
+            self.g_embeddings = g_embeddings
             self.g_params.append(self.g_embeddings)
             self.g_recurrent_unit = self.create_recurrent_unit(self.g_params)  # maps h_tm1 to h_t for generator
             self.g_output_unit = self.create_output_unit(self.g_params)  # maps h_t to o_t (output token logits)
@@ -36,8 +37,6 @@ class Generator(object):
         self.y = tf.placeholder(tf.int32, shape=[self.batch_size,
                                                  self.sequence_length])  # sequence of tokens of real data
 
-        # self.rewards = tf.placeholder(tf.float32, shape=[self.batch_size,
-        #                                                  self.sequence_length])  # get from rollout policy and discriminator
 
         # processed for batch
         with tf.device("/cpu:0"):
@@ -45,9 +44,6 @@ class Generator(object):
                                             perm=[1, 0, 2])  # seq_length x batch_size x emb_dim
 
         # Initial states
-        # self.h0 = tf.zeros([self.batch_size, self.hidden_dim])
-        # self.h0 = tf.random_uniform(shape=[self.batch_size, self.hidden_dim], minval=0, maxval=1)
-        # self.c0 = tf.random_uniform(shape=[self.batch_size, self.hidden_dim], minval=0, maxval=1)
         self.h_0 = tf.placeholder(tf.float32, shape=[batch_size, emb_dim])
         self.c_0 = tf.placeholder(tf.float32, shape=[batch_size, emb_dim])
         self.h0 = tf.stack([self.h_0, self.c_0])
@@ -130,31 +126,6 @@ class Generator(object):
 
         def get_feature(input_x, name=''):
             return self.discriminator.feature(input_x=input_x, name=name)
-
-        # def get_d_score(input_x):
-        #     d_score, _0, _1 = self.discriminator.predict(input_x=input_x)
-        #     return d_score
-
-        # def calculate_gaussian_mmd(x0, y0, x1, y1, batch_size, sigma = 20):
-        #     kxx = tf.reduce_sum(tf.exp(-tf.square(x0 - x1) / 2 / sigma), axis=1) / batch_size ** 2
-        #     kxy = tf.reduce_sum(tf.exp(-tf.square(x0 - y1) / 2 / sigma), axis=1) / batch_size ** 2
-        #     kyy = tf.reduce_sum(tf.exp(-tf.square(y0 - y1) / 2 / sigma), axis=1) / batch_size ** 2
-        #     return kxx - 2 * kxy + kyy
-        #
-        # def calc_mmd(x, y, batch_size):
-        #     xt = tf.transpose(x)
-        #     yt = tf.transpose(y)
-        #     x0 = tf.identity(x)
-        #     y0 = tf.identity(y)
-        #     x1 = tf.identity(xt)
-        #     y1 = tf.identity(yt)
-        #     for i in range(batch_size - 1):
-        #         x0 = tf.concat([x0, x], axis=1)
-        #         y0 = tf.concat([y0, y], axis=1)
-        #         x1 = tf.concat([x1, xt], axis=0)
-        #         y1 = tf.concat([y1, yt], axis=0)
-        #     gaussian_mmd = calculate_gaussian_mmd(x0, y0, x1, y1, batch_size)
-        #     return gaussian_mmd
 
         def compute_pairwise_distances(x, y):
             """Computes the squared pairwise Euclidean distances between x and y.
