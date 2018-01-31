@@ -327,6 +327,10 @@ class TextganMmd(Gan):
                            num_vocabulary=self.vocab_size)
         self.add_metric(docsim)
 
+        inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
+        inll.set_name('i-nll')
+        self.add_metric(inll)
+
     def train_real(self, data_loc=None):
         from utils.text_process import code_to_text
         from utils.text_process import get_tokenlized
@@ -395,6 +399,6 @@ class TextganMmd(Gan):
 
 if __name__ == '__main__':
     textgan = TextganMmd()
-    # textgan.train_oracle()
+    textgan.train_oracle()
     textgan.train_cfg()
-    # textgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/shi.txt')
+    textgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/shi.txt')

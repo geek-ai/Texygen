@@ -410,6 +410,10 @@ class Leakgan(Gan):
         docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file, num_vocabulary=self.vocab_size)
         self.add_metric(docsim)
 
+        inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
+        inll.set_name('i-nll')
+        self.add_metric(inll)
+
     def train_real(self, data_loc=None):
         from utils.text_process import code_to_text
         from utils.text_process import get_tokenlized

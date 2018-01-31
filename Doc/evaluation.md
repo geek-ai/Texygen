@@ -1,10 +1,19 @@
 ## Evaluations:
 
 
-#### Metrics
+### Metrics
 
 Paper #TODO
 
+####NLL loss:
+
+[SeqGAN: Sequence Generative Adversarial Nets with Policy Gradient](https://arxiv.org/abs/1609.05473)
+
+We use a randomly initialized LSTM as the true model, aka, the oracle.
+
+####BLEU score:
+
+[BLEU: a method for automatic evaluation of machine translation](https://dl.acm.org/citation.cfm?id=1073135)
 
 #### Experiment Results
 nll loss on oracle:

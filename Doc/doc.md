@@ -1,6 +1,24 @@
 ## Document
 
 ### How to run?
+
+```bash 
+#usage:
+python main.py -g <GAN type> -t <training method> -d <data location>
+  -g <GAN type>  
+    specify the GAN type in the experiment
+    <GAN type> = seqgan | maligan | rankgan | leakgan | gsgan | textgan | mle
+  -t <training method>
+    specify the traning method in the experiment
+    <training method> = oracle | cfg | real
+    default is oracle
+  -d <data location>
+    use user's own dataset
+    only avaiable with real data training 
+    default is 'data/image_coco.txt'
+```
+
+### simple tutorial
 The *basic* usage is 
 ```bash 
 python main.py -g <GAN type>
