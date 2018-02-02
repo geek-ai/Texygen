@@ -3,7 +3,7 @@
 Texygen is a text generation model benchmark platform for text generation researchers to easily conduct repeatable experiments and compare performance.
 It includes the most poplular GAN models in the text generation area along with some evaluation metrics.
 
-Should you have any questions and enquiries, please feel free to contact Yaoming Zhu (ym-zhu[AT]outlook.com) and Weinan Zhang (wnzhang[AT]sjtu.edu.cn).
+Should you have any questions and enquiries, please feel free to contact Yaoming Zhu (ym-zhu [AT] outlook.com) and [Weinan Zhang](http://wnzhang.net) (wnzhang [AT] sjtu.edu.cn).
 
 ## Requirement
 We suggest you run the platform under Python 3.6+ with following libs:
