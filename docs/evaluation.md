@@ -54,7 +54,7 @@ Similarly, evaluate word embedding on generate data, and get the similarity matr
 
 The EmbSim is defined as ![](fig/math/embsim.png)
 
-where ![](fig/math/wi.png) is the ith column of ![](fig/math/w.png)
+where ![](fig/math/wi.png) is the ith column of ![](fig/math/W.png)
 
 ### Experiment Results
 nll loss on oracle:
