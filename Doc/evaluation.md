@@ -14,10 +14,11 @@ Paper #TODO
 
 We use a randomly initialized LSTM as the true model, aka, the oracle. We need to optimize average negative log-likelihood of generate data on oracle LSTM.
 
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default">$$\mathrm{NLL} = - \mathbb{E}_{Y_{1:T \scriptsize{\sim} G_\theta}} [ \sum_{t=1}^T \log(G_{\mathrm{oracle}}(y_t|Y_{1:t-1})) ]$$
+
+</script>
 
 
-$$\mathrm{NLL} = - \mathbb{E}_{Y_{1:T \scriptsize{\sim} G_\theta}} [ \sum_{t=1}^T \log(G_{\mathrm{oracle}}(y_t|Y_{1:t-1})) ]$$
 
 where $$G_\theta$$ denotes generator LSTM, $$G_\mathrm{oracle}$$ denotes the oracle LSTM. 
 
