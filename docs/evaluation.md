@@ -5,7 +5,8 @@
 
 Paper #TODO
 
-####NLL loss:
+####NLL loss
+
 NLL is originally proposed by [SeqGAN] (https://arxiv.org/abs/1609.05473)
 
 A initialized LSTM is regarded as the true model, aka, the oracle. GAN models need to minimize average negative log-likelihood of generate data on oracle LSTM.
@@ -15,13 +16,14 @@ A initialized LSTM is regarded as the true model, aka, the oracle. GAN models ne
 
 where ![](fig/math/Gt.png) denotes generator LSTM, ![](fig/math/Go.png) denotes the oracle LSTM. 
 
-####inverse-NLL loss:
+####inverse-NLL loss
 
 inverse-NLL is dual to NLL loss. i.e. average negative log-likelihood of real data on generator. It can only be applied to RNN-based generator.
 
 ![](fig/math/inll.png)
 
-####BLEU score:
+####BLEU score
+
 BLEU is a widely used metric evaluating the word similarity between two sentences or documents.
 
 Please refer to [BLEU: a method for automatic evaluation of machine translation](https://dl.acm.org/citation.cfm?id=1073135)
@@ -30,7 +32,8 @@ Also refer to its python [nltk implementation with smooth function](http://www.n
 We use smooth function _method1_.
 
 
-####self-BLEU score:
+####self-BLEU score
+
 This is a metric we proposed in order to evaluate the mode collapse in each model.
 
 It's average BLEU score, with every generator's one instance as hypothesis, the other instances be references.
@@ -54,7 +57,7 @@ The EmbSim is defined as
 
 where ![](fig/math/wi.png) is the ith column of ![](fig/math/w.png)
 
-#### Experiment Results
+### Experiment Results
 nll loss on oracle:
 
 ![](fig/nll.png)
