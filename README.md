@@ -1,4 +1,4 @@
-<h1><img src="Doc/fig/texygen-01.png" width="250"></h1>
+<h1><img src="docs/fig/texygen-01.png" width="250"></h1>
 
 Texygen is a text generation model benchmark platform for text generation researchers to easily conduct repeatable experiments and compare performance.
 It includes the most poplular GAN models in the text generation area along with some evaluation metrics.
@@ -38,11 +38,11 @@ cd apex-text-gen
 # run SeqGAN with default setting
 python3 main.py
 ```
-[Detailed documentations here](Doc/doc.md)
+[Detailed documentations here](docs/doc.md)
 
 
 ## Evaluation Results
 
-[Detailed evaluation results here](Doc/evaluation.md)
+[Detailed evaluation results here](docs/evaluation.md)
 
 

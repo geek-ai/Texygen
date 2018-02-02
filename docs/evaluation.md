@@ -4,32 +4,27 @@
 ### Metrics
 
 Paper #TODO
-<img src="http://latex.codecogs.com/gif.latex?  " />
-
-
 
 ####NLL loss:
+NLL is originally proposed by [SeqGAN] (https://arxiv.org/abs/1609.05473)
 
-[SeqGAN: Sequence Generative Adversarial Nets with Policy Gradient](https://arxiv.org/abs/1609.05473)
+A initialized LSTM is regarded as the true model, aka, the oracle. GAN models need to minimize average negative log-likelihood of generate data on oracle LSTM.
 
-We use a randomly initialized LSTM as the true model, aka, the oracle. We need to optimize average negative log-likelihood of generate data on oracle LSTM.
-
-<img src="http://latex.codecogs.com/gif.latex?  \mathrm{NLL} = - \mathbb{E}_{Y_{1:T \scriptsize{\sim} G_\theta}} [ \sum_{t=1}^T \log(G_{\mathrm{oracle}}(y_t|Y_{1:t-1})) ] " />
-
+![](fig/math/nll.png)
 
 
-where  <img src="http://latex.codecogs.com/gif.latex? G_\theta " /> denotes generator LSTM,<img src="http://latex.codecogs.com/gif.latex?  G_\mathrm{oracle}" /> denotes the oracle LSTM. 
+where ![](fig/math/Gt.png) denotes generator LSTM, ![](fig/math/Go.png) denotes the oracle LSTM. 
 
 ####inverse-NLL loss:
 
-inverse-NLL is dual to NLL loss
+inverse-NLL is dual to NLL loss. i.e. average negative log-likelihood of real data on generator. It can only be applied to RNN-based generator.
 
-<img src="http://latex.codecogs.com/gif.latex? \mathrm{NLL} = - \mathbb{E}_{Y_{1:T \scriptsize{\sim} G_\mathrm{oracle}}} [ \sum_{t=1}^T \log(G_{\theta}(y_t|Y_{1:t-1})) ] " />
-
+![](fig/math/inll.png)
 
 ####BLEU score:
+BLEU is a widely used metric evaluating the word similarity between two sentences or documents.
 
-[BLEU: a method for automatic evaluation of machine translation](https://dl.acm.org/citation.cfm?id=1073135)
+Please refer to [BLEU: a method for automatic evaluation of machine translation](https://dl.acm.org/citation.cfm?id=1073135)
 
 Also refer to its python [nltk implementation with smooth function](http://www.nltk.org/_modules/nltk/translate/bleu_score.html). 
 We use smooth function _method1_.
@@ -41,16 +36,23 @@ This is a metric we proposed in order to evaluate the mode collapse in each mode
 It's average BLEU score, with every generator's one instance as hypothesis, the other instances be references.
 
 #### EmbSim
-First, we evaluate word embedding on real data using a skip-gram model.
 
-The, for each word embedding, we compute its cosine distance with the other words. And then formulate it as a matrix
+Inspired by BLEU, we propose a new metric named EmbSim evaluating the similarity between two documents. Instead of comparing sentences words by words, we compare the word embedding.
 
-<img src="http://latex.codecogs.com/gif.latex? W_{i,j} = \cos(e_i, e_j) " />
- be the word embedding for the ith word. We call <img src="http://latex.codecogs.com/gif.latex? W " />  the similarity matrix of real data.  
+First, word embedding is evaluated on real data using a skip-gram model.
 
-Similarly, evaluate word embedding on generate data, and get the similarity matrix <img src="http://latex.codecogs.com/gif.latex? W' " />  of generation data. 
+For each word embedding, we compute its cosine distance with the other words. And then formulate it as a matrix ![](fig/math/W.png), where
+![](fig/math/wij.png) with ![](fig/math/ei.png) 
+ be the word embedding of the ith word on real data. 
+ 
+We call ![](fig/math/W.png) the similarity matrix of real data.  
 
-<img src="http://latex.codecogs.com/gif.latex? \mathrm{EmbSim} = \log(\sum_{i=1}^N \cos(W'_i, W_i)/N) " />, where <img src="http://latex.codecogs.com/gif.latex? W_i" /> is the ith column of <img src="http://latex.codecogs.com/gif.latex?  W" />
+Similarly, evaluate word embedding on generate data, and get the similarity matrix ![](fig/math/wp.png) of generation data. ![](fig/math/wpij.png),  ![](fig/math/epi.png) be the word embedding of the ith word on generated data. 
+
+The EmbSim is defined as
+![](fig/math/embsim.png)
+
+where ![](fig/math/wi.png) is the ith column of ![](fig/math/w.png)
 
 #### Experiment Results
 nll loss on oracle:
@@ -84,6 +86,7 @@ on test dataset:
 | BLEU3 | 0.498  | 0.432   | 0.467   | 0.528   | -        | 0.520        |
 | BLEU4 | 0.294  | 0.257   | 0.264   | 0.355   | -        | 0.337        |
 | BLEU5 | 0.180  | 0.159   | 0.156   | 0.230   | -        | 0.218        |
+
 -:calculating
 
 Mode Collapse (self-BLEU):
@@ -97,6 +100,7 @@ Mode Collapse (self-BLEU):
 | BLEU5      | 0.489  | 0.437   | 0.618   | 0.780   | 0.746         |0.415         |
 
 Instances on image coco:
+
 seqGAN:
 ```text
 a very tall pointy across the street 
