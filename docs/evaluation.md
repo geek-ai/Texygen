@@ -52,8 +52,7 @@ We call ![](fig/math/W.png) the similarity matrix of real data.
 
 Similarly, evaluate word embedding on generate data, and get the similarity matrix ![](fig/math/wp.png) of generation data. ![](fig/math/wpij.png),  ![](fig/math/epi.png) be the word embedding of the ith word on generated data. 
 
-The EmbSim is defined as
-![](fig/math/embsim.png)
+The EmbSim is defined as ![](fig/math/embsim.png)
 
 where ![](fig/math/wi.png) is the ith column of ![](fig/math/w.png)
 
