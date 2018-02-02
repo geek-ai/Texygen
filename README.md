@@ -3,6 +3,8 @@
 Texygen is a text generation model benchmark platform for text generation researchers to easily conduct repeatable experiments and compare performance.
 It includes the most poplular GAN models in the text generation area along with some evaluation metrics.
 
+Should you have any questions and enquiries, please feel free to contact Yaoming Zhu (ym-zhu[AT]outlook.com) and Weinan Zhang (wnzhang[AT]sjtu.edu.cn).
+
 ## Requirement
 We suggest you run the platform under Python 3.6+ with following libs:
 * **tensorflow==1.3.0**
@@ -13,23 +15,19 @@ We suggest you run the platform under Python 3.6+ with following libs:
 
 Or just type `pip install requirements.txt` in your terminal.
 
-## Paper
+## Implemented Models and Original Papers:
 
-// TODO
+SeqGan --  [SeqGAN: Sequence Generative Adversarial Nets with Policy Gradient](https://arxiv.org/abs/1609.05473)
 
-#### Implemented Models and Original Paper:
+MaliGan -- [Maximum-Likelihood Augmented Discrete Generative Adversarial Networks](https://arxiv.org/abs/1702.07983)
 
-seqGan--  [SeqGAN: Sequence Generative Adversarial Nets with Policy Gradient](https://arxiv.org/abs/1609.05473)
+RankGan -- [Adversarial ranking for language generation](http://papers.nips.cc/paper/6908-adversarial-ranking-for-language-generation)
 
-maliGan-- [Maximum-Likelihood Augmented Discrete Generative Adversarial Networks](https://arxiv.org/abs/1702.07983)
+LeakGan -- [Long Text Generation via Adversarial Training with Leaked Information](https://arxiv.org/abs/1709.08624)
 
-rankGan-- [Adversarial ranking for language generation](http://papers.nips.cc/paper/6908-adversarial-ranking-for-language-generation)
-
-leakGan-- [Long Text Generation via Adversarial Training with Leaked Information](https://arxiv.org/abs/1709.08624)
-
-textGan-- [Adversarial Feature Matching for Text Generation](https://arxiv.org/abs/1706.03850)
+TextGan -- [Adversarial Feature Matching for Text Generation](https://arxiv.org/abs/1706.03850)
  
-gsGan-- [GANS for Sequences of Discrete Elements with the Gumbel-softmax Distribution](https://arxiv.org/abs/1611.04051)
+GSGan -- [GANS for Sequences of Discrete Elements with the Gumbel-softmax Distribution](https://arxiv.org/abs/1611.04051)
 
 
 ## Get Started
@@ -40,9 +38,11 @@ cd apex-text-gen
 # run SeqGAN with default setting
 python3 main.py
 ```
-[Document](Doc/doc.md)
+[Detailed documentations here](Doc/doc.md)
 
 
 ## Evaluation Results
 
-[evaluation results](Doc/evaluation.md)
+[Detailed evaluation results here](Doc/evaluation.md)
+
+
