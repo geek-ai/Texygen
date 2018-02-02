@@ -1,9 +1,7 @@
 <h1><img src="Doc/fig/texygen-01.png" width="250"></h1>
 
-Texygen is a text generation model evaluation platform, which included most poplular GAN models in the text generation area 
-along with some evaluation metric.
-
-It's easy to run and get evaluation results.
+Texygen is a text generation model benchmark platform for text generation researchers to easily conduct repeatable experiments and compare performance.
+It includes the most poplular GAN models in the text generation area along with some evaluation metrics.
 
 ## Requirement
 We suggest you run the platform under Python 3.6+ with following libs:
