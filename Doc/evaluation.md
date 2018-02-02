@@ -1,3 +1,4 @@
+
 ## Evaluations:
 
 
@@ -12,6 +13,9 @@ Paper #TODO
 [SeqGAN: Sequence Generative Adversarial Nets with Policy Gradient](https://arxiv.org/abs/1609.05473)
 
 We use a randomly initialized LSTM as the true model, aka, the oracle. We need to optimize average negative log-likelihood of generate data on oracle LSTM.
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
 
 $$\mathrm{NLL} = - \mathbb{E}_{Y_{1:T \scriptsize{\sim} G_\theta}} [ \sum_{t=1}^T \log(G_{\mathrm{oracle}}(y_t|Y_{1:t-1})) ]$$
 
