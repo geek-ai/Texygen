@@ -1,6 +1,6 @@
-![](Doc/fig/texygen-01.png)
+<h1><img src="Doc/fig/texygen-01.png" width="250"></h1>
 
-TexyGen is a text generation model evaluation platform, which included most poplular GAN models in the text generation area 
+Texygen is a text generation model evaluation platform, which included most poplular GAN models in the text generation area 
 along with some evaluation metric.
 
 It's easy to run and get evaluation results.
