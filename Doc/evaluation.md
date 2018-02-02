@@ -1,10 +1,10 @@
-
 ## Evaluations:
 
 
 ### Metrics
 
 Paper #TODO
+<img src="http://latex.codecogs.com/gif.latex?  " />
 
 
 
@@ -14,19 +14,18 @@ Paper #TODO
 
 We use a randomly initialized LSTM as the true model, aka, the oracle. We need to optimize average negative log-likelihood of generate data on oracle LSTM.
 
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default">$$\mathrm{NLL} = - \mathbb{E}_{Y_{1:T \scriptsize{\sim} G_\theta}} [ \sum_{t=1}^T \log(G_{\mathrm{oracle}}(y_t|Y_{1:t-1})) ]$$
-
-</script>
+<img src="http://latex.codecogs.com/gif.latex?  \mathrm{NLL} = - \mathbb{E}_{Y_{1:T \scriptsize{\sim} G_\theta}} [ \sum_{t=1}^T \log(G_{\mathrm{oracle}}(y_t|Y_{1:t-1})) ] " />
 
 
 
-where $$G_\theta$$ denotes generator LSTM, $$G_\mathrm{oracle}$$ denotes the oracle LSTM. 
+where  <img src="http://latex.codecogs.com/gif.latex? G_\theta " /> denotes generator LSTM,<img src="http://latex.codecogs.com/gif.latex?  G_\mathrm{oracle}" /> denotes the oracle LSTM. 
 
 ####inverse-NLL loss:
 
 inverse-NLL is dual to NLL loss
 
-$$\mathrm{NLL} = - \mathbb{E}_{Y_{1:T \scriptsize{\sim} G_\mathrm{oracle}}} [ \sum_{t=1}^T \log(G_{\theta}(y_t|Y_{1:t-1})) ]$$
+<img src="http://latex.codecogs.com/gif.latex? \mathrm{NLL} = - \mathbb{E}_{Y_{1:T \scriptsize{\sim} G_\mathrm{oracle}}} [ \sum_{t=1}^T \log(G_{\theta}(y_t|Y_{1:t-1})) ] " />
+
 
 ####BLEU score:
 
@@ -46,11 +45,12 @@ First, we evaluate word embedding on real data using a skip-gram model.
 
 The, for each word embedding, we compute its cosine distance with the other words. And then formulate it as a matrix
 
-$$W_{i,j} = \cos(e_i, e_j) $$, where $$e_i$$ be the word embedding for the ith word. We call $$W$$ be the similarity matrix. 
+<img src="http://latex.codecogs.com/gif.latex? W_{i,j} = \cos(e_i, e_j) " />
+ be the word embedding for the ith word. We call <img src="http://latex.codecogs.com/gif.latex? W " />  the similarity matrix of real data.  
 
-Similarly, evaluate word embedding on generate data, and get the similarity matrix $$W'$$
+Similarly, evaluate word embedding on generate data, and get the similarity matrix <img src="http://latex.codecogs.com/gif.latex? W' " />  of generation data. 
 
-$$\mathrm{EmbSim} = \log(\sum_{i=1}^N \cos(W'_i, W_i)/N) $$ where $$W_i $$ is the ith column of $$W$$
+<img src="http://latex.codecogs.com/gif.latex? \mathrm{EmbSim} = \log(\sum_{i=1}^N \cos(W'_i, W_i)/N) " />, where <img src="http://latex.codecogs.com/gif.latex? W_i" /> is the ith column of <img src="http://latex.codecogs.com/gif.latex?  W" />
 
 #### Experiment Results
 nll loss on oracle:

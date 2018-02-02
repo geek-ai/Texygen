@@ -1,4 +1,4 @@
-# TexyGen #
+![](Doc/fig/texygen-01.png)
 
 TexyGen is a text generation model evaluation platform, which included most poplular GAN models in the text generation area 
 along with some evaluation metric.
