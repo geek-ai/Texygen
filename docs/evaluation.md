@@ -7,7 +7,7 @@ Paper #TODO
 
 #### NLL loss
 
-NLL is originally proposed by [SeqGAN] (https://arxiv.org/abs/1609.05473)
+NLL is originally proposed by [SeqGAN](https://arxiv.org/abs/1609.05473)
 
 A initialized LSTM is regarded as the true model, aka, the oracle. GAN models need to minimize average negative log-likelihood of generate data on oracle LSTM.
 
