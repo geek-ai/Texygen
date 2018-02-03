@@ -5,20 +5,19 @@
 
 Paper #TODO
 
-#### NLL loss
+#### NLL-oracle loss
 
-NLL is originally proposed by [SeqGAN](https://arxiv.org/abs/1609.05473)
+NLL-oracle loss is originally proposed by [SeqGAN](https://arxiv.org/abs/1609.05473)
 
-A initialized LSTM is regarded as the true model, aka, the oracle. GAN models need to minimize average negative log-likelihood of generate data on oracle LSTM.
+A randomly initialized LSTM is regarded as the true model, aka, the oracle. GAN models need to minimize average negative log-likelihood of generate data on oracle LSTM.
 
 ![](fig/math/nll.png)
 
+where ![](fig/math/Gt.png) denotes generative model (generator LSTM), ![](fig/math/Go.png) denotes the true model (oracle LSTM). 
 
-where ![](fig/math/Gt.png) denotes generator LSTM, ![](fig/math/Go.png) denotes the oracle LSTM. 
+#### NLL-test loss
 
-#### inverse-NLL loss
-
-inverse-NLL is dual to NLL loss. i.e. average negative log-likelihood of real data on generator. It can only be applied to RNN-based generator.
+NLL-test loss is dual to NLL-oracle loss. i.e. it's average negative log-likelihood of real data on generator. It can only be applied to RNN-based generator.
 
 ![](fig/math/inll.png)
 
@@ -57,6 +56,12 @@ The EmbSim is defined as ![](fig/math/embsim.png)
 where ![](fig/math/wi.png) is the ith column of ![](fig/math/W.png)
 
 ### Experiment Results
+
+* epoch 1-80: pretrain process
+
+* epoch 81-181: adversarial training process
+  - gsGAN has no pretrain process
+
 nll loss on oracle:
 
 ![](fig/nll.png)
@@ -84,12 +89,10 @@ on test dataset:
 
 |       | seqGAN | maliGAN | rankGAN | leakGAN | textGAN      | training set |
 |-------|--------|---------|---------|---------|--------------|--------------|
-| BLEU2 | 0.745  | 0.673   | 0.743   | 0.746   | -        | 0.740        |
-| BLEU3 | 0.498  | 0.432   | 0.467   | 0.528   | -        | 0.520        |
-| BLEU4 | 0.294  | 0.257   | 0.264   | 0.355   | -        | 0.337        |
-| BLEU5 | 0.180  | 0.159   | 0.156   | 0.230   | -        | 0.218        |
-
--:calculating
+| BLEU2 | 0.745  | 0.673   | 0.743   | 0.746   | 0.593        | 0.740        |
+| BLEU3 | 0.498  | 0.432   | 0.467   | 0.528   | 0.463        | 0.520        |
+| BLEU4 | 0.294  | 0.257   | 0.264   | 0.355   | 0.277        | 0.337        |
+| BLEU5 | 0.180  | 0.159   | 0.156   | 0.230   | 0.207        | 0.218        |
 
 Mode Collapse (self-BLEU):
 

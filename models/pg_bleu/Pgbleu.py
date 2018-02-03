@@ -85,6 +85,10 @@ class Pgbleu(Gan):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.oracle_data_loader.create_batches(self.generator_file)
         if self.log is not None:
+            if self.epoch == 0 or self.epoch == 1:
+                for metric in self.metrics:
+                    self.log.write(metric.get_name() + ',')
+                self.log.write('\n')
             scores = super().evaluate()
             for score in scores:
                 self.log.write(str(score)+',')
