@@ -64,15 +64,15 @@ where ![](fig/math/wi.png) is the ith column of ![](fig/math/W.png)
 
 nll loss on oracle:
 
-![](fig/nll.png)
+<img src="fig/nll.png" width="600">
 
 inverse nll loss on oracle:
 
-![](fig/inll.png)
+<img src="fig/inll.png" width="600">
 
 embedding similarity on image coco:
 
-![](fig/embsim.png)
+<img src="fig/embsim.png" width="600">
 
 BLEU:
 
