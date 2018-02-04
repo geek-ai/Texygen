@@ -18,7 +18,7 @@ python main.py -g <GAN type> -t <training method> -d <data location>
     default is 'data/image_coco.txt'
 ```
 
-### simple tutorial
+### Quick tutorial
 The *basic* usage is 
 ```bash 
 python main.py -g <GAN type>
