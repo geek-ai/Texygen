@@ -185,10 +185,10 @@ class Leakgan(Gan):
             loss = pre_train_epoch_gen(self.sess, self.generator, self.gen_data_loader)
             end = time()
             print('epoch:' + str(epoch) + '\t time:' + str(end - start))
+            self.add_epoch()
             if epoch % 5 == 0:
                 generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                 self.evaluate()
-            self.add_epoch()
 
         print('start pre-train discriminator:')
         self.reset_epoch()
@@ -447,11 +447,11 @@ class Leakgan(Gan):
             loss = pre_train_epoch_gen(self.sess, self.generator, self.gen_data_loader)
             end = time()
             print('epoch:' + str(epoch) + '\t time:' + str(end - start))
+            self.add_epoch()
             if epoch % 5 == 0:
                 generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                 get_real_test_file()
                 self.evaluate()
-            self.add_epoch()
 
         print('start pre-train discriminator:')
         self.reset_epoch()

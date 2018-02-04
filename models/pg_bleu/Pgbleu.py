@@ -117,9 +117,9 @@ class Pgbleu(Gan):
             loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
             print('epoch:' + str(epoch) + '\t time:' + str(end - start))
+            self.add_epoch()
             if epoch % 5 == 0:
                 self.evaluate()
-            self.add_epoch()
 
         self.reset_epoch()
         print('start pg-bleu training:')
