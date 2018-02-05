@@ -26,7 +26,7 @@ def set_gan(gan_name):
     except KeyError:
         print(Fore.RED + 'Unsupported GAN type: ' + gan_name + Fore.RESET)
         sys.exit(-2)
-    return gan
+    return gan()
 
 
 def set_training(gan, training_method):
@@ -57,6 +57,7 @@ def parse_cmd(argv):
             print('usage: python main.py -g <gan_type>')
             print('       python main.py -g <gan_type> -t <train_type>')
             print('       python main.py -g <gan_type> -t realdata -d <your_data_location>')
+            sys.exit(0)
         if not '-g' in opt_arg.keys():
             print('unspecified GAN type, use MLE training only...')
             gan = set_gan('mle')
