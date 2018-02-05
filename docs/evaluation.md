@@ -62,11 +62,11 @@ where ![](fig/math/wi.png) is the ith column of ![](fig/math/W.png)
 * epoch 81-181: adversarial training process
   - gsGAN has no pretrain process
 
-nll loss on oracle:
+NLL Loss on Oracle (the lower the better):
 
 <img src="fig/nll.png" width="600">
 
-inverse nll loss on oracle:
+Inverse Nll Loss on Oracle:
 
 <img src="fig/inll.png" width="600">
 
