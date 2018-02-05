@@ -36,15 +36,6 @@ class Seqgan(Gan):
         self.test_file = 'save/test_file.txt'
 
     def init_metric(self):
-        from utils.metrics.Bleu import Bleu
-        bleu = Bleu(test_text=self.generator_file, real_text=self.oracle_file)
-        self.add_metric(bleu)
-
-        self.generator.set_similarity()
-        self.oracle.set_similarity()
-        embsim = EmbSim(model=self)
-        self.add_metric(embsim)
-
         nll = Nll(data_loader=self.oracle_data_loader, rnn=self.oracle, sess=self.sess)
         self.add_metric(nll)
 
@@ -75,6 +66,7 @@ class Seqgan(Gan):
             self.oracle_data_loader.create_batches(self.generator_file)
         if self.log is not None:
             if self.epoch == 0 or self.epoch == 1:
+                self.log.write('epochs, ')
                 for metric in self.metrics:
                     self.log.write(metric.get_name() + ',')
                 self.log.write('\n')
@@ -374,6 +366,6 @@ class Seqgan(Gan):
 
 if __name__ == '__main__':
     seqgan = Seqgan()
-    # seqgan.train_oracle()
-    seqgan.train_cfg()
+    seqgan.train_oracle()
+    # seqgan.train_cfg()
     # seqgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/toy.txt')

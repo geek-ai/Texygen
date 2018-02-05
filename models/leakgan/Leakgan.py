@@ -113,15 +113,6 @@ class Leakgan(Gan):
         self.set_data_loader(gen_loader=gen_dataloader, dis_loader=dis_dataloader, oracle_loader=oracle_dataloader)
 
     def init_metric(self):
-
-        bleu = Bleu(test_text=self.generator_file, real_text=self.oracle_file)
-        self.add_metric(bleu)
-
-        self.generator.set_similarity()
-        self.oracle.set_similarity()
-        embsim = EmbSim(model=self)
-        self.add_metric(embsim)
-
         nll = Nll(data_loader=self.oracle_data_loader, rnn=self.oracle, sess=self.sess)
         self.add_metric(nll)
 
