@@ -15,7 +15,7 @@ We suggest you run the platform under Python 3.6+ with following libs:
 
 Or just type `pip install requirements.txt` in your terminal.
 
-## Implemented Models and Original Papers:
+## Implemented Models and Original Papers
 
 SeqGan --  [SeqGAN: Sequence Generative Adversarial Nets with Policy Gradient](https://arxiv.org/abs/1609.05473)
 
@@ -33,16 +33,16 @@ GSGan -- [GANS for Sequences of Discrete Elements with the Gumbel-softmax Distri
 ## Get Started
 
 ```bash
-git clone 
-cd apex-text-gen
+git clone https://github.com/geek-ai/Texygen.git
+cd Texygen
 # run SeqGAN with default setting
 python3 main.py
 ```
-[Detailed documentations here](docs/doc.md)
+More detailed documentation for the platform and code setup is provided [here](docs/doc.md).
 
 
 ## Evaluation Results
 
-[Detailed evaluation results here](docs/evaluation.md)
+More detailed benchmark settings and evaluation results are provided [here](docs/evaluation.md).
 
 
