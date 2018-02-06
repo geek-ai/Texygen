@@ -29,7 +29,7 @@ Also refer to its python [nltk implementation with smooth function](http://www.n
 We use smooth function _method1_.
 
 
-#### self-BLEU score
+#### Self-BLEU score
 
 We propose Self-BLEU, a metric to evaluate the diversity of the generated data. Since BLEU aims to assess how similar two sentences are, it can also be used to evaluate how one sentence resembles the rest in a generated collection. Regarding one sentence as hypothesis and the others as reference, we can calculate BLEU score for every generated sentence, and define the average BLEU score to be the Self-BLEU of the document.
 
