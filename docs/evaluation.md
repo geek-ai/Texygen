@@ -60,7 +60,7 @@ where ![](fig/math/wi.png) is the ith column of ![](fig/math/W.png)
 * epoch 1-80: pretrain process
 
 * epoch 81-181: adversarial training process
-  - gsGAN has no pretrain process
+  - gsGAN has no pretrain process, and is not suitable for real data training
 
 NLL Loss on Oracle (the lower the better):
 
@@ -78,33 +78,35 @@ BLEU:
 
 on original dataset:
 
-|            | seqGAN | maliGAN | rankGAN | leakGAN | textGAN  |
-|------------|--------|---------|---------|---------|----------|
-| BLEU2      | 0.917  | 0.887   | 0.937   | 0.926   | 0.650    
-| BLEU3      | 0.747  | 0.697   | 0.799   | 0.816   | 0.645
-| BLEU4      | 0.530  | 0.482   | 0.601   | 0.660   | 0.596
-| BLEU5      | 0.348  | 0.312   | 0.414   | 0.470   | 0.523
+|            | seqGAN | maliGAN | rankGAN | leakGAN | textGAN  | MLE      |
+|------------|--------|---------|---------|---------|----------|----------|
+| BLEU2      | 0.917  | 0.887   | 0.937   | 0.926   | 0.650    | 0.921    
+| BLEU3      | 0.747  | 0.697   | 0.799   | 0.816   | 0.645    | 0.768    
+| BLEU4      | 0.530  | 0.482   | 0.601   | 0.660   | 0.596    | 0.570    
+| BLEU5      | 0.348  | 0.312   | 0.414   | 0.470   | 0.523    | 0.392    
 
 on test dataset:
 
-|       | seqGAN | maliGAN | rankGAN | leakGAN | textGAN      | training set |
+|       | seqGAN | maliGAN | rankGAN | leakGAN | textGAN      | MLE |
 |-------|--------|---------|---------|---------|--------------|--------------|
-| BLEU2 | 0.745  | 0.673   | 0.743   | 0.746   | 0.593        | 0.740        |
-| BLEU3 | 0.498  | 0.432   | 0.467   | 0.528   | 0.463        | 0.520        |
-| BLEU4 | 0.294  | 0.257   | 0.264   | 0.355   | 0.277        | 0.337        |
-| BLEU5 | 0.180  | 0.159   | 0.156   | 0.230   | 0.207        | 0.218        |
+| BLEU2 | 0.745  | 0.673   | 0.743   | 0.746   | 0.593        | 0.731        |
+| BLEU3 | 0.498  | 0.432   | 0.467   | 0.528   | 0.463        | 0.497        |
+| BLEU4 | 0.294  | 0.257   | 0.264   | 0.355   | 0.277        | 0.305        |
+| BLEU5 | 0.180  | 0.159   | 0.156   | 0.230   | 0.207        | 0.189        |
 
 Mode Collapse (self-BLEU):
 
 
-|            | seqGAN | maliGAN | rankGAN | leakGAN | textGAN       | training set  |
-|------------|--------|---------|---------|---------|---------------|---------------|
-| BLEU2      | 0.950  | 0.918   | 0.959   | 0.966   | 0.942         |0.892         |
-| BLEU3      | 0.840  | 0.781   | 0.882   | 0.913   | 0.931         |0.747         |
-| BLEU4      | 0.670  | 0.606   | 0.762   | 0.848   | 0.804         |0.573         |
-| BLEU5      | 0.489  | 0.437   | 0.618   | 0.780   | 0.746         |0.415         |
+|            | seqGAN | maliGAN | rankGAN | leakGAN | textGAN       | MLE  |
+|------------|--------|---------|---------|---------|---------------|--------------|
+| BLEU2      | 0.950  | 0.918   | 0.959   | 0.966   | 0.942         |0.916         |
+| BLEU3      | 0.840  | 0.781   | 0.882   | 0.913   | 0.931         |0.769         |
+| BLEU4      | 0.670  | 0.606   | 0.762   | 0.848   | 0.804         |0.583         |
+| BLEU5      | 0.489  | 0.437   | 0.618   | 0.780   | 0.746         |0.408         |
 
 Instances on image coco:
+
+* Full version can be accessed in `docs\instances` folder
 
 seqGAN:
 ```text
@@ -154,4 +156,13 @@ of a bathroom with a sink .
 is in a bathroom with a toilet and a sink . 
 a motorcycle . 
 is is flying very of a bathroom with a bathroom . 
+```
+MLE:
+```text
+there are tiled hanging across a large the toilet . 
+a large airplane is on the runway covered above of trees . 
+a sink filled with clutter and wooden cabinets . 
+a white towel on a stool above a blue counter top oven . 
+young girl laying on a table in front of a large hotel 
+a man bending while on a motorcycle with pots on a track travelling down on it 
 ```
