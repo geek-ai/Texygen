@@ -40,7 +40,7 @@ class Seqgan(Gan):
         self.add_metric(nll)
 
         inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
-        inll.set_name('i-nll')
+        inll.set_name('nll-test')
         self.add_metric(inll)
 
         from utils.metrics.DocEmbSim import DocEmbSim
@@ -135,7 +135,7 @@ class Seqgan(Gan):
         print('adversarial training:')
         self.reward = Reward(self.generator, .8)
         for epoch in range(self.adversarial_epoch_num):
-            print('epoch:' + str(epoch))
+            # print('epoch:' + str(epoch))
             start = time()
             for index in range(1):
                 samples = self.generator.generate(self.sess)
@@ -207,7 +207,7 @@ class Seqgan(Gan):
         self.init_cfg_metric(grammar=cfg_grammar)
         self.sess.run(tf.global_variables_initializer())
 
-        self.pre_epoch_num = 1
+        self.pre_epoch_num = 80
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-seqgan-cfg.csv', 'w')
         # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
@@ -236,7 +236,7 @@ class Seqgan(Gan):
         print('adversarial training:')
         self.reward = Reward(self.generator, .8)
         for epoch in range(self.adversarial_epoch_num):
-            print('epoch:' + str(epoch))
+            # print('epoch:' + str(epoch))
             start = time()
             for index in range(1):
                 samples = self.generator.generate(self.sess)
@@ -294,7 +294,7 @@ class Seqgan(Gan):
         self.add_metric(docsim)
 
         inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
-        inll.set_name('i-nll')
+        inll.set_name('nll-test')
         self.add_metric(inll)
 
 
@@ -340,7 +340,7 @@ class Seqgan(Gan):
         print('adversarial training:')
         self.reward = Reward(self.generator, .8)
         for epoch in range(self.adversarial_epoch_num):
-            print('epoch:' + str(epoch))
+            # print('epoch:' + str(epoch))
             start = time()
             for index in range(1):
                 samples = self.generator.generate(self.sess)
@@ -367,5 +367,5 @@ class Seqgan(Gan):
 if __name__ == '__main__':
     seqgan = Seqgan()
     seqgan.train_oracle()
-    # seqgan.train_cfg()
+    seqgan.train_cfg()
     # seqgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/toy.txt')

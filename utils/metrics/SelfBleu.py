@@ -7,10 +7,10 @@ from nltk.translate.bleu_score import SmoothingFunction
 from utils.metrics.Metrics import Metrics
 
 
-class collapse(Metrics):
+class SelfBleu(Metrics):
     def __init__(self, test_text='', gram=3):
         super().__init__()
-        self.name = 'collapse'
+        self.name = 'Self-Bleu'
         self.test_data = test_text
         # self.real_data = real_text
         self.gram = gram
@@ -77,11 +77,7 @@ class collapse(Metrics):
             hypothesis = reference[index]
             other = reference[:index] + reference[index+1:]
             result.append(pool.apply_async(self.calc_bleu, args=(other, hypothesis, weight)))
-        #
-        # with open(self.test_data) as test_data:
-        #     for hypothesis in test_data:
-        #         hypothesis = nltk.word_tokenize(hypothesis)
-        #         result.append(pool.apply_async(self.calc_bleu, args=(reference, hypothesis, weight)))
+
         score = 0.0
         cnt = 0
         for i in result:

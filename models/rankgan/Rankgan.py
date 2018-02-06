@@ -61,7 +61,7 @@ class Rankgan(Gan):
         self.add_metric(nll)
 
         inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
-        inll.set_name('i-nll')
+        inll.set_name('nll-test')
         self.add_metric(inll)
 
         from utils.metrics.DocEmbSim import DocEmbSim
@@ -131,7 +131,7 @@ class Rankgan(Gan):
         self.reward = Reward(self.generator, .8)
         for epoch in range(self.adversarial_epoch_num):
             start = time()
-            print('epoch:' + str(epoch))
+            # print('epoch:' + str(epoch))
             for index in range(1):
                 samples = self.generator.generate(self.sess)
                 self.dis_data_loader.load_train_data(self.oracle_file, self.generator_file)
@@ -234,7 +234,7 @@ class Rankgan(Gan):
         print('adversarial training:')
         self.reward = Reward(self.generator, .8)
         for epoch in range(self.adversarial_epoch_num):
-            print('epoch:' + str(epoch))
+            # print('epoch:' + str(epoch))
             start = time()
             for index in range(100):
                 samples = self.generator.generate(self.sess)
@@ -292,7 +292,7 @@ class Rankgan(Gan):
         self.add_metric(docsim)
 
         inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
-        inll.set_name('i-nll')
+        inll.set_name('nll-test')
         self.add_metric(inll)
 
     def train_real(self, data_loc=None):
@@ -337,7 +337,7 @@ class Rankgan(Gan):
         print('adversarial training:')
         self.reward = Reward(self.generator, .8)
         for epoch in range(self.adversarial_epoch_num):
-            print('epoch:' + str(epoch))
+            # print('epoch:' + str(epoch))
             start = time()
             for index in range(1):
                 samples = self.generator.generate(self.sess)

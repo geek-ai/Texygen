@@ -60,7 +60,7 @@ class Maligan(Gan):
         self.add_metric(nll)
 
         inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
-        inll.set_name('i-nll')
+        inll.set_name('nll-test')
         self.add_metric(inll)
 
         from utils.metrics.DocEmbSim import DocEmbSim
@@ -129,7 +129,7 @@ class Maligan(Gan):
         print('adversarial training:')
         self.reward = Reward()
         for epoch in range(self.adversarial_epoch_num):
-            print('epoch:' + str(epoch))
+            # print('epoch:' + str(epoch))
             start = time()
             for index in range(50):
                 samples = self.generator.generate(self.sess)
@@ -230,7 +230,7 @@ class Maligan(Gan):
         print('adversarial training:')
         self.reward = Reward()
         for epoch in range(self.adversarial_epoch_num):
-            print('epoch:' + str(epoch))
+            # print('epoch:' + str(epoch))
             start = time()
             for index in range(1):
                 samples = self.generator.generate(self.sess)
@@ -287,7 +287,7 @@ class Maligan(Gan):
         self.add_metric(docsim)
 
         inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
-        inll.set_name('i-nll')
+        inll.set_name('nll-test')
         self.add_metric(inll)
 
     def train_real(self, data_loc=None):
@@ -332,7 +332,7 @@ class Maligan(Gan):
         print('adversarial training:')
         self.reward = Reward()
         for epoch in range(self.adversarial_epoch_num):
-            print('epoch:' + str(epoch))
+            # print('epoch:' + str(epoch))
             start = time()
             for index in range(1):
                 samples = self.generator.generate(self.sess)

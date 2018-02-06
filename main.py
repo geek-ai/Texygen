@@ -22,11 +22,15 @@ def set_gan(gan_name):
     gans['maligan'] = Maligan
     gans['mle'] = Mle
     try:
-        gan = gans[gan_name.lower()]
+        Gan = gans[gan_name.lower()]
+        gan = Gan()
+        gan.vocab_size = 5000
+        gan.generate_num = 10000
+        return gan
     except KeyError:
         print(Fore.RED + 'Unsupported GAN type: ' + gan_name + Fore.RESET)
         sys.exit(-2)
-    return gan()
+
 
 
 def set_training(gan, training_method):

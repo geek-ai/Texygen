@@ -84,7 +84,7 @@ class TextganMmd(Gan):
         self.add_metric(nll)
 
         inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
-        inll.set_name('i-nll')
+        inll.set_name('nll-test')
         self.add_metric(inll)
 
         from utils.metrics.DocEmbSim import DocEmbSim
@@ -172,7 +172,7 @@ class TextganMmd(Gan):
         del oracle_code
         print('adversarial training:')
         for epoch in range(self.adversarial_epoch_num):
-            print('epoch:' + str(epoch))
+            # print('epoch:' + str(epoch))
             start = time()
             for index in range(100):
                 self.train_generator()
@@ -270,7 +270,7 @@ class TextganMmd(Gan):
 
         del oracle_code
         for epoch in range(self.adversarial_epoch_num):
-            print('epoch:' + str(epoch))
+            # print('epoch:' + str(epoch))
             start = time()
             for i in range(100):
                 self.train_generator()
@@ -324,7 +324,7 @@ class TextganMmd(Gan):
         self.add_metric(docsim)
 
         inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
-        inll.set_name('i-nll')
+        inll.set_name('nll-test')
         self.add_metric(inll)
 
     def train_real(self, data_loc=None):
@@ -378,7 +378,7 @@ class TextganMmd(Gan):
 
         print('adversarial training:')
         for epoch in range(self.adversarial_epoch_num):
-            print('epoch:' + str(epoch))
+            # print('epoch:' + str(epoch))
             start = time()
             for index in range(100):
                 self.train_generator()

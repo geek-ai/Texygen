@@ -117,7 +117,7 @@ class Leakgan(Gan):
         self.add_metric(nll)
 
         inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
-        inll.set_name('i-nll')
+        inll.set_name('nll-test')
         self.add_metric(inll)
 
         from utils.metrics.DocEmbSim import DocEmbSim
@@ -406,7 +406,7 @@ class Leakgan(Gan):
         self.add_metric(docsim)
 
         inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
-        inll.set_name('i-nll')
+        inll.set_name('nll-test')
         self.add_metric(inll)
 
     def train_real(self, data_loc=None):

@@ -6,7 +6,7 @@ from utils.metrics.Metrics import Metrics
 class Nll(Metrics):
     def __init__(self, data_loader, rnn, sess):
         super().__init__()
-        self.name = 'nll'
+        self.name = 'nll-oracle'
         self.data_loader = data_loader
         self.sess = sess
         self.rnn = rnn
