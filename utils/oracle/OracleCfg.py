@@ -7,32 +7,6 @@ from nltk.parse.generate import generate
 from utils.text_process import *
 
 
-# demo_grammar = """
-#   S -> NP VP
-#   NP -> Det N
-#   PP -> P NP
-#   VP -> 'slept' | 'saw' NP | 'walked' PP
-#   Det -> 'the' | 'a'
-#   N -> 'man' | 'park' | 'dog'
-#   P -> 'in' | 'with'
-# """
-
-# cfg_grammar = """
-#   S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x | '(' S ')'
-#   PLUS -> '+'
-#   SUB -> '-'
-#   PROD -> '*'
-#   DIV -> '/'
-#   x -> 'x'
-#
-# """
-# grammar = CFG.fromstring(cfg_grammar)
-# print(grammar)
-# sens = generate(grammar, depth=11)
-# for sentence in generate(grammar, depth=11):
-#     print(' '.join(sentence))
-
-
 
 class OracleCfg:
     def __init__(self, cfg_grammar=None, origin_file='save/origin.txt', oracle_file='save/oracle.txt',
@@ -45,7 +19,7 @@ class OracleCfg:
               SUB -> '-'
               PROD -> '*'
               DIV -> '/'
-              x -> 'x'
+              x -> 'x' | 'y'
             """
 
         self.grammar = CFG.fromstring(cfg_grammar)

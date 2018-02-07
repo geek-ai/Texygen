@@ -184,14 +184,12 @@ class Seqgan(Gan):
 
     def train_cfg(self):
         cfg_grammar = """
-            S -> NP VP
-            VP -> V NP | V NP PP
-            PP -> P NP
-            V -> "saw" | "ate" | "walked"
-            NP -> "john" | "mary" | "bob" | Det N | Det N PP
-            Det -> "a" | "an" | "the" | "my"
-            N -> "man" | "dog" | "cat" | "telescope" | "park"
-            P -> "in" | "on" | "by" | "with"
+          S -> S PLUS x | S SUB x |  S PROD x | S DIV x | x | '(' S ')'
+          PLUS -> '+'
+          SUB -> '-'
+          PROD -> '*'
+          DIV -> '/'
+          x -> 'x' | 'y'
         """
 
         wi_dict_loc, iw_dict_loc = self.init_cfg_training(cfg_grammar)
@@ -264,7 +262,7 @@ class Seqgan(Gan):
         from utils.text_process import text_precess, text_to_code
         from utils.text_process import get_tokenlized, get_word_list, get_dict
         if data_loc is None:
-            data_loc = '../../data/image_coco.txt'
+            data_loc = 'data/image_coco.txt'
         self.sequence_length, self.vocab_size = text_precess(data_loc)
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
                               hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,

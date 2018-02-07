@@ -262,7 +262,7 @@ class Rankgan(Gan):
         from utils.text_process import get_tokenlized, get_word_list, get_dict
         # from utils.text_process import get_dict
         if data_loc is None:
-            data_loc = '../../data/image_coco.txt'
+            data_loc = 'data/image_coco.txt'
         self.sequence_length, self.vocab_size = text_precess(data_loc)
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
                               hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,

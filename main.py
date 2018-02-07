@@ -52,7 +52,7 @@ def set_training(gan, training_method):
 
 def parse_cmd(argv):
     try:
-        opts, args = getopt.getopt(argv, "hg:t:")
+        opts, args = getopt.getopt(argv, "hg:t:d:")
         print(argv)
         print(opts)
         opt_arg = dict(opts)

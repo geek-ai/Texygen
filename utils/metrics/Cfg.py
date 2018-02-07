@@ -14,7 +14,7 @@ class Cfg(Metrics):
               SUB -> '-'
               PROD -> '*'
               DIV -> '/'
-              x -> 'x'
+              x -> 'x' | 'y'
             """
         self.grammar = nltk.CFG.fromstring(cfg_grammar)
         self.parser = nltk.ChartParser(self.grammar)

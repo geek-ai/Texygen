@@ -368,7 +368,7 @@ class Leakgan(Gan):
         from utils.text_process import get_tokenlized, get_word_list, get_dict
         # from utils.text_process import get_dict
         if data_loc is None:
-            data_loc = '../../data/image_coco.txt'
+            data_loc = 'data/image_coco.txt'
         self.sequence_length, self.vocab_size = text_precess(data_loc)
 
         goal_out_size = sum(self.num_filters)
