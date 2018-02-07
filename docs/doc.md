@@ -39,6 +39,12 @@ Or just use default database (we offer you image coco language dataset)
 ```bash 
 python main.py -g <GAN type> -t real 
 ```
+
+* Note that if you want to use Chinese as training data, you need to segment characters first, like in `data/shi.txt`.
+ In `utils/text_process` we provide `chinese_process` function for you.
+
+The max length of generated samples are determined by the maximum sentence length of training set.
+
 #### Context Free Grammar (CFG) training
 TexyGen also allows the model to learn certain context free grammar.
  ```bash 

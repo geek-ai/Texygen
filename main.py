@@ -53,10 +53,10 @@ def set_training(gan, training_method):
 def parse_cmd(argv):
     try:
         opts, args = getopt.getopt(argv, "hg:t:d:")
-        print(argv)
-        print(opts)
+        # print(argv)
+        # print(opts)
         opt_arg = dict(opts)
-        print(opt_arg)
+        # print(opt_arg)
         if '-h' in opt_arg.keys():
             print('usage: python main.py -g <gan_type>')
             print('       python main.py -g <gan_type> -t <train_type>')

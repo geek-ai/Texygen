@@ -1,4 +1,19 @@
+# coding=utf-8
 import nltk
+
+
+def chinese_process(filein, fileout):
+    with open(filein, 'r') as infile:
+        with open(fileout, 'w') as outfile:
+            for line in infile:
+                output = list()
+                line = nltk.word_tokenize(line)[0]
+                for char in line:
+                    output.append(char)
+                    output.append(' ')
+                output.append('\n')
+                output = ''.join(output)
+                outfile.write(output)
 
 
 def text_to_code(tokens, dictionary, seq_len):
