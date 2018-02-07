@@ -2,6 +2,8 @@
 
 Texygen is a benchmarking platform to support research on open-domain text generation models. Texygen has not only implemented a majority of text generation models, but also covered a set of metrics that evaluate the diversity, the quality and the consistency of the generated texts. The Texygen platform could help standardize the research on text generation and facilitate the sharing of fine-tuned open-source implementations among researchers for their work.  As a consequence, this would help in improving the reproductivity and reliability of future research work in text generation.
 
+For more details, please refer to our ArXiv paper: [Texygen: A Benchmarking Platform for Text Generation Models](https://arxiv.org/abs/1802.01886) by Yaoming Zhu et al. 2018.
+
 Should you have any questions and enquiries, please feel free to contact Yaoming Zhu (ym-zhu [AT] outlook.com) and [Weinan Zhang](http://wnzhang.net) (wnzhang [AT] sjtu.edu.cn).
 
 ## Requirement
@@ -62,4 +64,12 @@ Mode Collapse (Self-BLEU):
 
 More detailed benchmark settings and evaluation results are provided [here](docs/evaluation.md).
 
+## Reference
+
+@article{zhu2018texygen,<br>
+  title={Texygen: A Benchmarking Platform for Text Generation Models},<br>
+  author={Zhu, Yaoming and Lu, Sidi and Zheng, Lei and Guo, Jiaxian and Zhang, Weinan and Wang, Jun and Yu, Yong},<br>
+  journal={arXiv preprint arXiv:1802.01886},<br>
+  year={2018}<br>
+}
 
