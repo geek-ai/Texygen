@@ -67,9 +67,9 @@ More detailed benchmark settings and evaluation results are provided [here](docs
 ## Reference
 
 @article{zhu2018texygen,<br>
-  title={Texygen: A Benchmarking Platform for Text Generation Models},<br>
-  author={Zhu, Yaoming and Lu, Sidi and Zheng, Lei and Guo, Jiaxian and Zhang, Weinan and Wang, Jun and Yu, Yong},<br>
-  journal={arXiv preprint arXiv:1802.01886},<br>
-  year={2018}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;  title={Texygen: A Benchmarking Platform for Text Generation Models},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;  author={Zhu, Yaoming and Lu, Sidi and Zheng, Lei and Guo, Jiaxian and Zhang, Weinan and Wang, Jun and Yu, Yong},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;  journal={arXiv preprint arXiv:1802.01886},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;  year={2018}<br>
 }
 
