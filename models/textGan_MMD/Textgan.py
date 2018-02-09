@@ -156,7 +156,7 @@ class TextganMmd(Gan):
             start = time()
             loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
+            print('epoch:' + str(self.epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -177,7 +177,7 @@ class TextganMmd(Gan):
             for index in range(100):
                 self.train_generator()
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
+            print('epoch:' + str(self.epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -252,7 +252,7 @@ class TextganMmd(Gan):
             start = time()
             loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
+            print('epoch:' + str(self.epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -276,7 +276,7 @@ class TextganMmd(Gan):
                 self.train_generator()
             end = time()
             self.add_epoch()
-            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
+            print('epoch:' + str(self.epoch) + '\t time:' + str(end - start))
             if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
                 get_cfg_test_file()
@@ -361,7 +361,7 @@ class TextganMmd(Gan):
             start = time()
             loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
+            print('epoch:' + str(self.epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -383,7 +383,7 @@ class TextganMmd(Gan):
             for index in range(100):
                 self.train_generator()
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
+            print('epoch:' + str(self.epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                 generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)

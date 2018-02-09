@@ -107,7 +107,7 @@ class Pgbleu(Gan):
             start = time()
             loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
-            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
+            print('epoch:' + str(self.epoch) + '\t time:' + str(end - start))
             self.add_epoch()
             if epoch % 5 == 0:
                 self.evaluate()
@@ -128,7 +128,7 @@ class Pgbleu(Gan):
                 _ = self.sess.run(self.generator.g_updates, feed_dict=feed)
             end = time()
             self.add_epoch()
-            print('epoch:' + str(epoch) + '\t time:' + str(end - start))
+            print('epoch:' + str(self.epoch) + '\t time:' + str(end - start))
             if epoch % 5 == 0 or epoch == self.adversarial_epoch_num - 1:
                 self.evaluate()
 

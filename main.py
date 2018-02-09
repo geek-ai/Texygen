@@ -24,8 +24,8 @@ def set_gan(gan_name):
     try:
         Gan = gans[gan_name.lower()]
         gan = Gan()
-        gan.vocab_size = 5000
-        gan.generate_num = 10000
+        # gan.vocab_size = 5000
+        # gan.generate_num = 10000
         return gan
     except KeyError:
         print(Fore.RED + 'Unsupported GAN type: ' + gan_name + Fore.RESET)

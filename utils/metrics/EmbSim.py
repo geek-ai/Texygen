@@ -7,7 +7,7 @@ from utils.metrics.Metrics import Metrics
 class EmbSim(Metrics):
     def __init__(self, model):
         super().__init__()
-        self.name = 'EmbeddingSimilarity'
+        self.name = 'EmbeddingSimilarity_LSTM'
         self.sess = model.sess
         self.oracle = model.oracle
         self.generator = model.generator
