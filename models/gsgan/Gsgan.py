@@ -358,8 +358,3 @@ class Gsgan(Gan):
             for _ in range(15):
                 self.train_discriminator()
 
-if __name__ == '__main__':
-    gan = Gsgan()
-    # gan.train_oracle()
-    gan.train_cfg()
-    # gan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/shi.txt')

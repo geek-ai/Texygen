@@ -133,6 +133,4 @@ class Pgbleu(Gan):
                 self.evaluate()
 
 
-if __name__ == '__main__':
-    pgbleu = Pgbleu()
-    pgbleu.train_oracle()
+

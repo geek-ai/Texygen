@@ -392,9 +392,3 @@ class TextganMmd(Gan):
             for _ in range(15):
                 self.train_discriminator()
 
-
-if __name__ == '__main__':
-    textgan = TextganMmd()
-    textgan.train_oracle()
-    textgan.train_cfg()
-    textgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/shi.txt')

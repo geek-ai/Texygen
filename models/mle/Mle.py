@@ -169,6 +169,4 @@ class Mle(Gan):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
 
 
-if __name__ == '__main__':
-    pgbleu = Mle()
-    pgbleu.train_oracle()
+

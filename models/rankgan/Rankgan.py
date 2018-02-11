@@ -359,8 +359,3 @@ class Rankgan(Gan):
             for _ in range(15):
                 self.train_discriminator()
 
-if __name__ == '__main__':
-    rankgan = Rankgan()
-    # rankgan.train_oracle()
-    # rankgan.train_cfg()
-    rankgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/shi.txt')

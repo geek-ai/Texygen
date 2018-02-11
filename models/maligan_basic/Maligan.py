@@ -353,8 +353,3 @@ class Maligan(Gan):
             for _ in range(15):
                 self.train_discriminator()
 
-if __name__ == '__main__':
-    maligan = Maligan()
-    # maligan.train_oracle()
-    # maligan.train_cfg()
-    maligan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/toy.txt')

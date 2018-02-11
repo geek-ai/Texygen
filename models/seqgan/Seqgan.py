@@ -362,8 +362,3 @@ class Seqgan(Gan):
                 self.train_discriminator()
 
 
-if __name__ == '__main__':
-    seqgan = Seqgan()
-    seqgan.train_oracle()
-    seqgan.train_cfg()
-    # seqgan.train_real('/home/ymzhu/Desktop/GAN/apex-text-gen/data/toy.txt')

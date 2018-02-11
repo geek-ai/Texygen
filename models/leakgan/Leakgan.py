@@ -494,7 +494,3 @@ class Leakgan(Gan):
                 print('epoch:' + str(epoch) + '--' + str(epoch_))
                 self.train_discriminator()
 
-if __name__ == '__main__':
-    gan = Leakgan()
-    gan.train_oracle()
-    # gan.train_cfg()
