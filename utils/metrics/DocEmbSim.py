@@ -137,8 +137,6 @@ class DocEmbSim(Metrics):
             average_loss = 0
             generate_num = len(data)
             for step in range(num_steps):
-                # batch_data = list()
-                # batch_labels = list()
                 for index in range(generate_num):
                     cur_batch_data, cur_batch_labels = self.generate_batch(
                         batch_size, num_skips, skip_window, data[index])

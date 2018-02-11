@@ -58,9 +58,7 @@ class Generator(object):
         def _g_recurrence(i, x_t, h_tm1, gen_o, gen_x, gen_ot):
             h_t = self.g_recurrent_unit(x_t, h_tm1)  # hidden_memory_tuple
             o_t = self.g_output_unit(h_t)  # batch x vocab , logits not prob
-            # hv = o_t
             next_token = tf.cast(tf.argmax(o_t, axis=1), tf.int32)
-            # next_token = tf.cast(tf.argmax(tf.nn.softmax(tf.multiply(hv, 1e4)), axis=1), tf.int32)
             x_tp1 = tf.matmul(tf.nn.softmax(tf.multiply(o_t, 1e3)), self.g_embeddings)
             gen_o = gen_o.write(i, tf.reduce_sum(tf.multiply(tf.one_hot(next_token, self.num_vocabulary, 1.0, 0.0),
                                                              tf.nn.softmax(o_t)), 1))  # [batch_size] , prob
@@ -202,7 +200,6 @@ class Generator(object):
 
     def generate(self, sess, get_z = False):
         z_h0 = np.random.uniform(low=-.01, high=1, size=[self.batch_size, self.emb_dim])
-        # z_h0 = np.zeros(shape=[self.batch_size, self.emb_dim])
         z_c0 = np.zeros(shape=[self.batch_size, self.emb_dim])
         feed = {
             self.h_0: z_h0,

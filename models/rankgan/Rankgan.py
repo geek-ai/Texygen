@@ -109,7 +109,7 @@ class Rankgan(Gan):
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)
 
-        # rollout = Reward(generator, update_rate)
+        rollout = Reward(generator, update_rate)
         print('start pre-train generator:')
         for epoch in range(self.pre_epoch_num):
             start = time()
@@ -260,7 +260,7 @@ class Rankgan(Gan):
     def init_real_trainng(self, data_loc=None):
         from utils.text_process import text_precess, text_to_code
         from utils.text_process import get_tokenlized, get_word_list, get_dict
-        # from utils.text_process import get_dict
+        from utils.text_process import get_dict
         if data_loc is None:
             data_loc = 'data/image_coco.txt'
         self.sequence_length, self.vocab_size = text_precess(data_loc)

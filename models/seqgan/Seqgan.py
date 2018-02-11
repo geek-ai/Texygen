@@ -58,7 +58,7 @@ class Seqgan(Gan):
                 self.discriminator.input_y: y_batch,
             }
             loss,_ = self.sess.run([self.discriminator.d_loss, self.discriminator.train_op], feed)
-            # print(loss)
+            print(loss)
 
     def evaluate(self):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
@@ -113,7 +113,6 @@ class Seqgan(Gan):
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)
 
-        # rollout = Reward(generator, update_rate)
         print('start pre-train generator:')
         for epoch in range(self.pre_epoch_num):
             start = time()
@@ -208,7 +207,6 @@ class Seqgan(Gan):
         self.pre_epoch_num = 80
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-seqgan-cfg.csv', 'w')
-        # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)

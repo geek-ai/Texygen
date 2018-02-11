@@ -164,11 +164,6 @@ class Discriminator(object):
 
             # Final (unnormalized) scores and predictions
             with tf.name_scope("output"):
-                # W = tf.Variable(tf.truncated_normal([num_filters_total, num_classes], stddev=0.1), name="W")
-                # b = tf.Variable(tf.constant(0.1, shape=[num_classes]), name="b")
-                # l2_loss += tf.nn.l2_loss(W)
-                # l2_loss += tf.nn.l2_loss(b)
-                # self.scores = tf.nn.xw_plus_b(self.h_drop, W, b, name="scores")
                 """
                 scores = tf.TensorArray(dtype=tf.float32, size=batch_size, dynamic_size=False, infer_shape=True)
                 def rank_recurrence(i, scores):
@@ -192,7 +187,6 @@ class Discriminator(object):
                 self.scores = tf.reshape(self.scores, [-1])
                 self.ypred_for_auc = tf.reshape(tf.nn.softmax(self.scores), [-1])
                 self.log_score = tf.log(self.ypred_for_auc)
-                # self.predictions = tf.argmax(self.scores, 1, name="predictions")
 
             # CalculateMean cross-entropy loss
             with tf.name_scope("loss"):
@@ -207,4 +201,3 @@ class Discriminator(object):
         d_optimizer = tf.train.AdamOptimizer(1e-4)
         grads_and_vars = d_optimizer.compute_gradients(self.loss, self.params, aggregation_method=2)
         self.train_op = d_optimizer.apply_gradients(grads_and_vars)
-        # self.train_op = d_optimizer.minimize(self.loss)

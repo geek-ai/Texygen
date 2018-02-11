@@ -2,31 +2,11 @@ import numpy as np
 import tensorflow as tf
 
 
-# def generate_samples(sess, trainable_model, batch_size, generated_num, output_file=None):
-#     # Generate Samples
-#     generated_samples = []
-#     for _ in range(int(generated_num / batch_size)):
-#         generated_samples.extend(trainable_model.generate(sess))
-#
-#     if output_file is not None:
-#         with open(output_file, 'w') as fout:
-#             for poem in generated_samples:
-#                 buffer = ' '.join([str(x) for x in poem]) + '\n'
-#                 fout.write(buffer)
-#         return
-#
-#     codes = ""
-#     for poem in generated_samples:
-#         buffer = ' '.join([str(x) for x in poem]) + '\n'
-#         codes += buffer
-#     return codes
-
-def generate_samples(sess, trainable_model, batch_size, generated_num, output_file=None, get_code = True):
+def generate_samples(sess, trainable_model, batch_size, generated_num, output_file=None, get_code=True):
     # Generate Samples
     generated_samples = []
     for _ in range(int(generated_num / batch_size)):
         generated_samples.extend(trainable_model.generate(sess))
-
     codes = list()
     if output_file is not None:
         with open(output_file, 'w') as fout:
@@ -36,12 +16,12 @@ def generate_samples(sess, trainable_model, batch_size, generated_num, output_fi
                 if get_code:
                     codes.append(poem)
         return np.array(codes)
-
     codes = ""
     for poem in generated_samples:
         buffer = ' '.join([str(x) for x in poem]) + '\n'
         codes += buffer
     return codes
+
 
 def init_sess():
     config = tf.ConfigProto()

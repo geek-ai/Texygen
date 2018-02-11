@@ -93,11 +93,7 @@ class TextganMmd(Gan):
         self.add_metric(docsim)
 
     def train_discriminator(self):
-        # generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
-        # self.dis_data_loader.load_train_data(self.oracle_file, self.generator_file)
         for _ in range(3):
-            # self.dis_data_loader.next_batch()
-            # x_batch, y_batch = self.dis_data_loader.next_batch()
             x_batch, z_h = self.generator.generate(self.sess, True)
             y_batch = self.gen_data_loader.next_batch()
             feed = {
@@ -289,7 +285,6 @@ class TextganMmd(Gan):
     def init_real_trainng(self, data_loc=None):
         from utils.text_process import text_precess, text_to_code
         from utils.text_process import get_tokenlized, get_word_list, get_dict
-        # from utils.text_process import get_dict
         if data_loc is None:
             data_loc = 'data/image_coco.txt'
         self.sequence_length, self.vocab_size = text_precess(data_loc)

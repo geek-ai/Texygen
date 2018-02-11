@@ -78,7 +78,6 @@ class Discriminator(object):
 
         self.D_input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
         self.D_input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
-        # self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
 
         with tf.name_scope('D_update'):
             self.D_l2_loss = tf.constant(0.0)
@@ -88,7 +87,6 @@ class Discriminator(object):
             with tf.variable_scope("feature") as self.feature_scope:
                 D_feature = self.FeatureExtractor_unit(self.D_input_x,self.dropout_keep_prob)#,self.dropout_keep_prob)
                 self.feature_scope.reuse_variables()
-            # tf.get_variable_scope().reuse_variables()
 
             D_scores, D_predictions,self.ypred_for_auc = self.classification(D_feature)
             losses = tf.nn.softmax_cross_entropy_with_logits(logits=D_scores, labels=self.D_input_y)

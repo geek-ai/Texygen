@@ -108,7 +108,6 @@ class Maligan(Gan):
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)
 
-        # rollout = Reward(generator, update_rate)
         print('start pre-train generator:')
         for epoch in range(self.pre_epoch_num):
             start = time()

@@ -6,7 +6,6 @@ from utils.utils import init_sess
 class Gan:
     def __init__(self):
         self.oracle = None
-        # self.reward = None
         self.generator = None
         self.discriminator = None
         self.gen_data_loader = None
@@ -22,9 +21,6 @@ class Gan:
 
     def set_oracle(self, oracle):
         self.oracle = oracle
-
-    # def set_reward(self, reward):
-    #     self.reward = reward
 
     def set_generator(self, generator):
         self.generator = generator

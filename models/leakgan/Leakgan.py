@@ -169,7 +169,6 @@ class Leakgan(Gan):
         for a in range(1):
             g = self.sess.run(self.generator.gen_x, feed_dict={self.generator.drop_out: 1, self.generator.train: 1})
 
-        # rollout = Reward(generator, update_rate)
         print('start pre-train generator:')
         for epoch in range(self.pre_epoch_num):
             start = time()
@@ -297,7 +296,6 @@ class Leakgan(Gan):
         self.pre_epoch_num = 80
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-leakganbasic-cfg.csv', 'w')
-        # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)
@@ -366,7 +364,6 @@ class Leakgan(Gan):
     def init_real_trainng(self, data_loc=None):
         from utils.text_process import text_precess, text_to_code
         from utils.text_process import get_tokenlized, get_word_list, get_dict
-        # from utils.text_process import get_dict
         if data_loc is None:
             data_loc = 'data/image_coco.txt'
         self.sequence_length, self.vocab_size = text_precess(data_loc)
@@ -484,7 +481,6 @@ class Leakgan(Gan):
                 loss = pre_train_epoch_gen(self.sess, self.generator, self.gen_data_loader)
                 end = time()
                 print('epoch:' + str(epoch) + '--' + str(epoch_) + '\t time:' + str(end - start))
-                # self.add_epoch()
                 if epoch % 5 == 0:
                     generate_samples_gen(self.sess, self.generator, self.batch_size, self.generate_num,
                                          self.generator_file)

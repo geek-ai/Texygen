@@ -47,7 +47,6 @@ class Gsgan(Gan):
                                       num_filters=self.num_filters, non_static=True,
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
-        # discriminator = None
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, sess=self.sess,
                               hidden_dim=self.hidden_dim, sequence_length=self.sequence_length, discriminator=discriminator,
                               start_token=self.start_token)
@@ -96,11 +95,7 @@ class Gsgan(Gan):
             feed = {
                 self.discriminator.input_x: to_one_hot(x_batch),
                 self.discriminator.input_y: y_batch,
-                # self.discriminator.dropout_keep_prob: 0.8,
-                # self.discriminator.batch_size: len(x_batch),
-                # self.discriminator.real_len: real_len(x_batch),
             }
-            # _ = self.sess.run(self.discriminator.train_op, feed)
             _ = self.sess.run(
                 [self.discriminator.train_op], feed)
 
@@ -180,7 +175,6 @@ class Gsgan(Gan):
                                       num_filters=self.num_filters, non_static=True,
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
-        # discriminator = None
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, sess=self.sess,
                               hidden_dim=self.hidden_dim, sequence_length=self.sequence_length, discriminator=discriminator,
                               start_token=self.start_token)
@@ -222,7 +216,6 @@ class Gsgan(Gan):
         self.pre_epoch_num = 0
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-gsgan-cfg.csv', 'w')
-        # generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)
@@ -274,7 +267,6 @@ class Gsgan(Gan):
                                       num_filters=self.num_filters, non_static=True,
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
-        # discriminator = None
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, sess=self.sess,
                               hidden_dim=self.hidden_dim, sequence_length=self.sequence_length, discriminator=discriminator,
                               start_token=self.start_token)

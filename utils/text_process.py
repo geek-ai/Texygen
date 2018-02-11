@@ -31,19 +31,14 @@ def text_to_code(tokens, dictionary, seq_len):
     return code_str
 
 
-def code_to_text(codes, dictionary, seq_len=None):
+def code_to_text(codes, dictionary):
     paras = ""
     eof_code = len(dictionary)
-    # sentence = codes.split('\n')
     for line in codes:
-        # numbers = [int(s) for s in line.split() if s.isdigit()]
         numbers = map(int, line)
         for number in numbers:
             if number == eof_code:
                 continue
-                # paras += '\n'
-                # break
-            # paras += (dictionary[str(number)] + ' ')
             paras += (dictionary[str(number)] + ' ')
         paras += '\n'
     return paras
@@ -75,33 +70,6 @@ def get_dict(word_set):
         index_word_dict[str(index)] = word
         index += 1
     return word_index_dict, index_word_dict
-
-
-# def text_precess(train_text_loc, test_text_loc=None):
-#     train_tokens = get_tokenlized(train_text_loc)
-#     if test_text_loc is None:
-#         test_tokens = list()
-#     else:
-#         test_tokens = get_tokenlized(test_text_loc)
-#     word_set = get_word_list(train_tokens + test_tokens)
-#     # text = train_text + test_text
-#     [word_index_dict, index_word_dict] = get_dict(word_set)
-#     with open('save/word_index_dict.json', 'w') as outfile:
-#         json.dump(word_index_dict, outfile)
-#     with open('save/index_word_dict.json', 'w') as outfile:
-#         json.dump(index_word_dict, outfile)
-#     if test_text_loc is None:
-#         sequence_len = len(max(train_tokens, key=len))
-#     else:
-#         sequence_len = max(len(max(train_tokens, key=len)), len(max(test_tokens, key=len)))
-#     with open('save/eval_data.txt', 'w') as outfile:
-#         outfile.write(text_to_code(test_tokens, word_index_dict, sequence_len))
-#     paras = dict()
-#     paras['sequence_len'] = sequence_len
-#     paras['vocab_size'] = len(word_index_dict)
-#     with open('paras/paras.json', 'w') as outfile:
-#         json.dump(paras, outfile)
-#     return sequence_len, len(word_index_dict) + 1, 'save/word_index_dict.json', 'save/index_word_dict.json'
 
 def text_precess(train_text_loc, test_text_loc=None):
     train_tokens = get_tokenlized(train_text_loc)

@@ -12,7 +12,6 @@ class SelfBleu(Metrics):
         super().__init__()
         self.name = 'Self-Bleu'
         self.test_data = test_text
-        # self.real_data = real_text
         self.gram = gram
         self.sample_size = 500
         self.reference = None

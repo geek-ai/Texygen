@@ -12,15 +12,8 @@ class Discriminator():
         self.hidden_dim = hidden_unit
         self.num_classes = num_classes
         self.sequence_length = sequence_length
-        # self.dropout_keep_prob = tf.placeholder(tf.float32, name='dropout_keep_prob')
         self.batch_size = tf.constant(value=[batch_size])
         self.batch_size_scale = batch_size
-        # self.pad = tf.placeholder(tf.float32, [None, 1, embedding_size, 1], name='pad')
-
-        # self.real_len = tf.constant(value=sequence_length, shape=[batch_size])
-        # self.filter_sizes = filter_sizes
-        # self.embedding_size = embedding_size
-        # self.num_filters = num_filters
         self.hidden_unit = hidden_unit
         self.d_params = []
         l2_loss = tf.constant(0.0)
@@ -48,7 +41,6 @@ class Discriminator():
 
         self.params = [param for param in tf.trainable_variables() if 'discriminator' in param.name]
         d_optimizer = tf.train.AdamOptimizer(1e-4)
-        # grads_and_vars = d_optimizer.compute_gradients(self.loss, self.params, aggregation_method=2)
         self.grad_clip = 5.0
         self.pretrain_grad, _ = tf.clip_by_global_norm(tf.gradients(self.loss, self.params), self.grad_clip)
         self.train_op = d_optimizer.apply_gradients(zip(self.pretrain_grad, self.params))

@@ -399,9 +399,6 @@ class Generator(object):
             o_t_Worker = self.g_worker_output_unit(h_t_Worker)  # batch x vocab , logits not prob
 
             o_t_Worker = tf.reshape(o_t_Worker, [self.batch_size, self.num_vocabulary, self.goal_size])
-            # o_t_Worker = tf.nn.softmax(o_t_Worker)
-            # o_t_Worker = tf.expand_dims(o_t_Worker,2)   # batch x vocab x 1
-            # o_t_Worker = tf.multiply(o_t_Worker,tf.nn.softmax(self.W_workerOut_change) ) #batch x vocab x goal_size
 
             h_t_manager = self.g_manager_recurrent_unit(feature, h_tm1_manager)
             sub_goal = self.g_manager_output_unit(h_t_manager)

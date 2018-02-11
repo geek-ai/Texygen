@@ -7,7 +7,6 @@ class DataLoader():
         self.token_stream = []
         self.seq_length = seq_length
         self.end_token = end_token
-        # self.num_batch = int(len(self.token_stream) / self.batch_size)
 
     def create_batches(self, data_file):
         self.token_stream = []

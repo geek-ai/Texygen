@@ -22,15 +22,12 @@ class Discriminator(object):
         self.input_y_lable = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
 
         self.zh = tf.placeholder(tf.float32, [None, emd_dim], name="zh")
-        # self.zc = tf.placeholder(tf.float32, [None], name="zc")
 
         self.dropout_keep_prob = dropout_keep_prob
         self.filter_sizes = filter_sizes
         self.num_filters = num_filters
         self.sequence_length = sequence_length
         self.num_classes = num_classes
-        # self.embbeding_mat = None
-        # self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
 
         # Keeping track of l2 regularization loss (optional)
         l2_loss = tf.constant(0.0)
