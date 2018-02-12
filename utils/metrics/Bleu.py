@@ -21,7 +21,7 @@ class Bleu(Metrics):
     def get_name(self):
         return self.name
 
-    def get_score(self, is_fast=True, ignore=True):
+    def get_score(self, is_fast=True, ignore=False):
         if ignore:
             return 0
         if self.is_first:
