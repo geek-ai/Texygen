@@ -14,7 +14,7 @@ We suggest you run the platform under Python 3.6+ with following libs:
 * NLTK 3.2.3
 * CUDA 7.5+ (Suggested for GPU speed up, not compulsory)    
 
-Or just type `pip install requirements.txt` in your terminal.
+Or just type `pip install -r requirements.txt` in your terminal.
 
 ## Implemented Models and Original Papers
 
