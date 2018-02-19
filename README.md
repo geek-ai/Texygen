@@ -2,7 +2,10 @@
 
 DiversityNet is a benchmarking platform to support research on molecule generation models. DiversityNet is not only implementing a majority of molecule generation models, but is also covering a set of metrics that evaluate the diversity and the quality of the generated molecules. The DiversityNet platform could help standardize the research on molecule generation and facilitate the sharing of fine-tuned open-source implementations among researchers and practitioners.  As a consequence, this would help in improving the reproductivity and reliability of future research work in molecule generation.
 
-For more details, please refer to our Authorea paper: [DiversityNet: a collaborative benchmark for generative AI models in chemistry](https://www.authorea.com/users/226673/articles/285209-diversitynet-a-collaborative-benchmark-for-generative-ai-models-in-chemistry) 
+For more details, please refer to our Authorea paper: [DiversityNet: a collaborative benchmark for generative AI models in chemistry](https://www.authorea.com/users/226673/articles/285209-diversitynet-a-collaborative-benchmark-for-generative-ai-models-in-chemistry) .
+
+See also the Texygen paper: [Texygen: A Benchmarking Platform for Text Generation Models](https://arxiv.org/abs/1802.01886) by Yaoming Zhu et al. 2018, on which this code is based.
+
 
 Should you have any questions and enquiries, please feel free to contact us on Telegram (https://t.me/joinchat/Go4mTw0drJBrCdal0JWu1g) or otherwise Mostapha Benhenda (mostaphabenhenda [AT] gmail.com).
 
