@@ -26,7 +26,7 @@ To do:
 * Nearest-Neighbor diversity
 * Entropy
 * Wasserstein
-* Frechet ChemBL distance (contact @bioinf-jku  (https://github.com/bioinf-jku) )
+* Frechet ChemblNet Distance (contact @gklambauer (https://github.com/gklambauer) )
 * ...
 
 
