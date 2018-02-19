@@ -7,7 +7,7 @@ For more details, please refer to our Authorea paper: [DiversityNet: a collabora
 See also the Texygen paper: [Texygen: A Benchmarking Platform for Text Generation Models](https://arxiv.org/abs/1802.01886) by Yaoming Zhu et al. 2018, on which this code is based.
 
 
-Should you have any questions and enquiries, please feel free to contact us on Telegram (https://t.me/joinchat/Go4mTw0drJBrCdal0JWu1g) or otherwise Mostapha Benhenda (mostaphabenhenda [AT] gmail.com).
+Should you have any questions and enquiries, please feel free to contact us on [Telegram](https://t.me/joinchat/Go4mTw0drJBrCdal0JWu1g) or otherwise Mostapha Benhenda (mostaphabenhenda [AT] gmail.com).
 
 ## Requirement
 We suggest you run the platform under Python 3.6+ with following libs:
