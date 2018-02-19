@@ -54,7 +54,7 @@ To do:
 ## Get Started
 
 ```bash
-git clone https://github.com/geek-ai/Texygen.git
+git clone https://github.com/startcrowd/DiversityNet.git
 cd Texygen
 # run SeqGAN with default setting
 python3 main.py
