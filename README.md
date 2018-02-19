@@ -28,7 +28,7 @@ Or just type `pip install -r requirements.txt` in your terminal.
 To do:
 * Nearest-Neighbor diversity
 * Entropy
-* Wasserstein
+* Earth mover
 * Frechet ChemblNet Distance (contact @gklambauer (https://github.com/gklambauer) )
 * ...
 
