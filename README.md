@@ -83,11 +83,11 @@ More detailed benchmark settings and evaluation results are provided [here](docs
 
 ## Reference
 
-@article{zhu2018texygen,<br>
+@article{diversitynet2018,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;  title={DiversityNet: a collaborative benchmark for generative AI models in chemistry},<br>
 &nbsp;&nbsp;&nbsp;&nbsp;  author={Mostapha Benhenda and Esben Jannik Bjerrum,...},<br>
 &nbsp;&nbsp;&nbsp;&nbsp;  journal={Authorea preprint},<br>
 &nbsp;&nbsp;&nbsp;&nbsp;  year={2018}<br>
 }
 
-This code is based on Texygen by Geek.AI (https://github.com/geek-ai/Texygen). Many thanks to [Geek.AI](http://geek.ai/)
+This code is based on Texygen (https://github.com/geek-ai/Texygen). Many thanks to [Geek.AI](http://geek.ai/)
