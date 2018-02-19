@@ -1,10 +1,10 @@
 <h1>DiversityNet</h1>
 
-DiversityNet is a benchmarking platform to support research on open-domain molecule generation models. DiversityNet is not only implementing a majority of molecule generation models, but also covered a set of metrics that evaluate the diversity, the quality and the consistency of the generated molecules. The DiversityNet platform could help standardize the research on molecule generation and facilitate the sharing of fine-tuned open-source implementations among researchers and practitioners for their work.  As a consequence, this would help in improving the reproductivity and reliability of future research work in molecule generation.
+DiversityNet is a benchmarking platform to support research on molecule generation models. DiversityNet is not only implementing a majority of molecule generation models, but is also covering a set of metrics that evaluate the diversity and the quality of the generated molecules. The DiversityNet platform could help standardize the research on molecule generation and facilitate the sharing of fine-tuned open-source implementations among researchers and practitioners.  As a consequence, this would help in improving the reproductivity and reliability of future research work in molecule generation.
 
-For more details, please refer to our Authorea paper: [Texygen: A Benchmarking Platform for Text Generation Models](https://arxiv.org/abs/1802.01886) by Yaoming Zhu et al. 2018.
+For more details, please refer to our Authorea paper: [DiversityNet: a collaborative benchmark for generative AI models in chemistry](https://www.authorea.com/users/226673/articles/285209-diversitynet-a-collaborative-benchmark-for-generative-ai-models-in-chemistry) 
 
-Should you have any questions and enquiries, please feel free to contact on Telegram Yaoming Zhu (ym-zhu [AT] outlook.com) and [Weinan Zhang](http://wnzhang.net) (wnzhang [AT] sjtu.edu.cn).
+Should you have any questions and enquiries, please feel free to contact us on Telegram (https://t.me/joinchat/Go4mTw0drJBrCdal0JWu1g) or otherwise Mostapha Benhenda (mostaphabenhenda [AT] gmail.com).
 
 ## Requirement
 We suggest you run the platform under Python 3.6+ with following libs:
@@ -14,9 +14,26 @@ We suggest you run the platform under Python 3.6+ with following libs:
 * NLTK 3.2.3
 * CUDA 7.5+ (Suggested for GPU speed up, not compulsory)    
 
+* Rdkit (to do)
+
 Or just type `pip install -r requirements.txt` in your terminal.
 
+## Implemented Metrics
+
+* Internal diversity (see self-diversity): (https://github.com/mostafachatillon/ChemGAN-challenge/blob/b70d0b2c1efc00ecade3fde1896751876a89e9ec/model/mol_metrics_new2.py#L277) 
+
+To do:
+* Nearest-Neighbor diversity
+* Entropy
+* Wasserstein
+* Frechet ChemBL distance (contact @bioinf-jku  (https://github.com/bioinf-jku) )
+*...
+
+
+
 ## Implemented Models and Original Papers
+
+* See the list here: (https://medium.com/the-ai-lab/diversitynet-a-collaborative-benchmark-for-generative-ai-models-in-chemistry-f1b9cc669cba#27e5)
 
 * **SeqGAN** -  [SeqGAN: Sequence Generative Adversarial Nets with Policy Gradient](https://arxiv.org/abs/1609.05473)
 
@@ -67,9 +84,10 @@ More detailed benchmark settings and evaluation results are provided [here](docs
 ## Reference
 
 @article{zhu2018texygen,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;  title={Texygen: A Benchmarking Platform for Text Generation Models},<br>
-&nbsp;&nbsp;&nbsp;&nbsp;  author={Zhu, Yaoming and Lu, Sidi and Zheng, Lei and Guo, Jiaxian and Zhang, Weinan and Wang, Jun and Yu, Yong},<br>
-&nbsp;&nbsp;&nbsp;&nbsp;  journal={arXiv preprint arXiv:1802.01886},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;  title={DiversityNet: a collaborative benchmark for generative AI models in chemistry},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;  author={Mostapha Benhenda and Esben Jannik Bjerrum,...},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;  journal={Authorea preprint},<br>
 &nbsp;&nbsp;&nbsp;&nbsp;  year={2018}<br>
 }
 
+## This code is based on Texygen by Geek.AI (https://github.com/geek-ai/Texygen). Many thanks to [Geek.AI](http://geek.ai/)
