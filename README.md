@@ -27,7 +27,7 @@ To do:
 * Entropy
 * Wasserstein
 * Frechet ChemBL distance (contact @bioinf-jku  (https://github.com/bioinf-jku) )
-*...
+* ...
 
 
 
@@ -90,4 +90,4 @@ More detailed benchmark settings and evaluation results are provided [here](docs
 &nbsp;&nbsp;&nbsp;&nbsp;  year={2018}<br>
 }
 
-## This code is based on Texygen by Geek.AI (https://github.com/geek-ai/Texygen). Many thanks to [Geek.AI](http://geek.ai/)
+This code is based on Texygen by Geek.AI (https://github.com/geek-ai/Texygen). Many thanks to [Geek.AI](http://geek.ai/)
