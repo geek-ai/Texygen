@@ -8,7 +8,7 @@ Should you have any questions and enquiries, please feel free to contact Yaoming
 
 ## Requirement
 We suggest you run the platform under Python 3.6+ with following libs:
-* **TensorFlow 1.3.0**
+* **TensorFlow >= 1.5.0**
 * Numpy 1.12.1
 * Scipy 0.19.0
 * NLTK 3.2.3

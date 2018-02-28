@@ -27,7 +27,7 @@ def linear(input_, output_size, scope=None):
     input_size = shape[1]
 
     # Now the computation.
-    with tf.variable_scope(scope or "SimpleLinear"):
+    with tf.variable_scope(scope or "SimpleLinear", reuse=tf.AUTO_REUSE):
         matrix = tf.get_variable("Matrix", [output_size, input_size], dtype=input_.dtype)
         bias_term = tf.get_variable("Bias", [output_size], dtype=input_.dtype)
 
@@ -41,7 +41,7 @@ def highway(input_, size, num_layers=1, bias=-2.0, f=tf.nn.relu, scope='Highway'
     where g is nonlinearity, t is transform gate, and (1 - t) is carry gate.
     """
 
-    with tf.variable_scope(scope):
+    with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
         for idx in range(num_layers):
             g = f(linear(input_, size, scope='highway_lin_%d' % idx))
 
@@ -153,9 +153,8 @@ class Discriminator(object):
             # Add highway
             with tf.name_scope("highway"):
                 self.h_highway = highway(self.h_pool_flat, self.h_pool_flat.get_shape()[1], 1, 0, scope="highway")
-            with tf.name_scope("highway-ref"):
                 self.h_highway_ref = highway(self.h_pool_flat_ref, self.h_pool_flat_ref.get_shape()[1], 1, 0,
-                                             scope="highway-ref")
+                                             scope="highway")
 
             # Add dropout
             with tf.name_scope("dropout"):
@@ -177,14 +176,19 @@ class Discriminator(object):
                 )
                 """
                 score = []
+                """
                 for i in range(batch_size):
                     value = tf.constant(0.0, dtype=tf.float32)
                     for j in range(reference_size):
                         value += cosine_distance(tf.nn.embedding_lookup(self.h_drop, i),
                                                  tf.nn.embedding_lookup(self.h_drop_ref, j))
-                    score.append(value)
+                    score.append(value) 
                 self.scores = tf.stack(score)
                 self.scores = tf.reshape(self.scores, [-1])
+                """
+                self.reference = tf.reduce_mean(tf.nn.l2_normalize(self.h_drop_ref, axis=-1), axis=0, keep_dims=True)
+                self.feature = tf.nn.l2_normalize(self.h_drop, axis=-1)
+                self.scores = tf.reshape(self.feature @ tf.transpose(self.reference, perm=[1, 0]), [-1])
                 self.ypred_for_auc = tf.reshape(tf.nn.softmax(self.scores), [-1])
                 self.log_score = tf.log(self.ypred_for_auc)
 
@@ -194,8 +198,8 @@ class Discriminator(object):
                 self.pos_vec = tf.nn.embedding_lookup(tf.transpose(self.input_y), 0)
                 losses_minus = self.log_score * self.neg_vec
                 losses_posit = self.log_score * self.pos_vec
-                self.loss = (- tf.reduce_sum(losses_minus) / tf.reduce_sum(self.neg_vec) + tf.reduce_sum(
-                    losses_posit) / tf.reduce_sum(self.pos_vec)) / reference_size
+                self.loss = (- tf.reduce_sum(losses_minus) / tf.maximum(tf.reduce_sum(self.neg_vec), 1e-5) + tf.reduce_sum(
+                    losses_posit) / tf.maximum(tf.reduce_sum(self.pos_vec), 1e-5)) / reference_size
 
         self.params = [param for param in tf.trainable_variables() if 'discriminator' in param.name]
         d_optimizer = tf.train.AdamOptimizer(1e-4)
