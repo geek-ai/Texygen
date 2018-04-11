@@ -109,7 +109,7 @@ class Rankgan(Gan):
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)
 
-        rollout = Reward(generator, update_rate)
+        rollout = Reward(self.generator, .8)
         print('start pre-train generator:')
         for epoch in range(self.pre_epoch_num):
             start = time()
@@ -236,7 +236,7 @@ class Rankgan(Gan):
         for epoch in range(self.adversarial_epoch_num):
             # print('epoch:' + str(epoch))
             start = time()
-            for index in range(100):
+            for index in range(1):
                 samples = self.generator.generate(self.sess)
                 rewards = self.reward.get_reward(self.sess, samples, 16, self.discriminator, self.dis_data_loader)
                 feed = {
