@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from tensorflow.app import flags
 
 from utils.utils import init_sess
 
@@ -18,6 +19,15 @@ class Gan:
         self.adversarial_epoch_num = 100
         self.log = None
         self.reward = None
+
+        flags.DEFINE_string('oracle_file', 'save/oracle.txt', '')
+        flags.DEFINE_string('generator_file', 'save/generator.txt', '')
+        flags.DEFINE_string('test_file', 'save/test_file.txt', '')
+        FLAGS = flags.FLAGS
+        self.oracle_file = FLAGS.oracle_file
+        self.generator_file = FLAGS.generator_file
+        self.test_file = FLAGS.test_file
+
 
     def set_oracle(self, oracle):
         self.oracle = oracle
