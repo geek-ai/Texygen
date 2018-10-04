@@ -1,7 +1,7 @@
-from argparse import ArgumentParser
 import sys
 
 from colorama import Fore
+import tensorflow as tf
 
 from models.gsgan.Gsgan import Gsgan
 from models.leakgan.Leakgan import Leakgan
@@ -54,19 +54,20 @@ def set_training(gan, training_method):
 
 
 def parse_cmd():
-    parser = ArgumentParser()
-    parser.add_argument('-g', '--gan-type', help='The type of GAN to use',
-                        choices=set(supported_gans.keys()), default='mle')
-    parser.add_argument('-t', '--train-type', help='Type of training to use',
-                        choices=supported_training, default='oracle')
-    parser.add_argument('-d', '--data', default='data/image_coco.txt')
-    return parser.parse_known_args()
+    flags = tf.app.flags
+    flags.DEFINE_enum('gan_type', 'mle', list(supported_gans.keys()),
+                      'Type of GAN to use')
+    flags.DEFINE_enum('train_type', 'oracle', supported_training,
+                      'Type of training to use')
+    flags.DEFINE_string('data', 'data/image_coco.txt', '')
+    return
 
 if __name__ == '__main__':
-    args, unused_args = parse_cmd()
-    gan = set_gan(args.gan_type)
-    train_f = set_training(gan, args.train_type)
-    if args.train_type == 'real':
-        train_f(args.data)
+    parse_cmd()
+    flags = tf.app.flags.FLAGS
+    gan = set_gan(flags.gan_type)
+    train_f = set_training(gan, flags.train_type)
+    if flags.train_type == 'real':
+        train_f(flags.data)
     else:
         train_f()
