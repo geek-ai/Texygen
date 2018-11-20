@@ -64,6 +64,9 @@ def parse_cmd():
 
 if __name__ == '__main__':
     parse_cmd()
+    tf.app.flags.DEFINE_string('oracle_file', 'save/oracle.txt', '')
+    tf.app.flags.DEFINE_string('generator_file', 'save/generator.txt', '')
+    tf.app.flags.DEFINE_string('test_file', 'save/test_file.txt', '')
     flags = tf.app.flags.FLAGS
     gan = set_gan(flags.gan_type)
     train_f = set_training(gan, flags.train_type)
