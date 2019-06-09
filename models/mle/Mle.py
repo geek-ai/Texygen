@@ -28,6 +28,7 @@ class Mle(Gan):
 
         self.oracle_file = 'save/oracle.txt'
         self.generator_file = 'save/generator.txt'
+        self.oracle_test_file = 'save/oracle_test.txt'
         self.test_file = 'save/test_file.txt'
 
     def init_oracle_trainng(self, oracle=None):
@@ -42,22 +43,21 @@ class Mle(Gan):
                               start_token=self.start_token)
         self.set_generator(generator)
 
-        gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        oracle_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        dis_dataloader = None
-
-        self.set_data_loader(gen_loader=gen_dataloader, dis_loader=dis_dataloader, oracle_loader=oracle_dataloader)
+        self.set_data_loader()
+        self.dis_data_loader = None
 
     def init_metric(self):
         nll = Nll(data_loader=self.oracle_data_loader, rnn=self.oracle, sess=self.sess)
         self.add_metric(nll)
 
-        inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
+        self.nll_data_loader.create_batches(self.oracle_test_file)
+        inll = Nll(data_loader=self.nll_data_loader, rnn=self.generator, sess=self.sess)
         inll.set_name('nll-test')
         self.add_metric(inll)
 
         from utils.metrics.DocEmbSim import DocEmbSim
-        docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file, num_vocabulary=self.vocab_size)
+        docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file,
+                           num_vocabulary=self.vocab_size)
         self.add_metric(docsim)
 
     def train_discriminator(self):
@@ -83,7 +83,7 @@ class Mle(Gan):
                 self.log.write('\n')
             scores = super().evaluate()
             for score in scores:
-                self.log.write(str(score)+',')
+                self.log.write(str(score) + ',')
             self.log.write('\n')
             return scores
         return super().evaluate()
@@ -96,6 +96,7 @@ class Mle(Gan):
         self.log = open('experiment-log-mle.csv', 'w')
         generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
+        generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.oracle_test_file)
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)
         self.init_metric()
@@ -103,7 +104,7 @@ class Mle(Gan):
         print('start pre-train generator:')
         for epoch in range(self.pre_epoch_num):
             start = time()
-            loss = pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
+            pre_train_epoch(self.sess, self.generator, self.gen_data_loader)
             end = time()
             print('epoch:' + str(self.epoch) + '\t time:' + str(end - start))
             self.add_epoch()
@@ -112,23 +113,22 @@ class Mle(Gan):
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         return
 
-
-    def init_real_trainng(self, data_loc=None):
+    def init_real_training(self, data_loc=None, nll_test_loc=None):
         from utils.text_process import text_precess, text_to_code
         from utils.text_process import get_tokenlized, get_word_list, get_dict
         if data_loc is None:
             data_loc = 'data/image_coco.txt'
+        if nll_test_loc is not None:
+            self.nll_test_loc = nll_test_loc
         self.sequence_length, self.vocab_size = text_precess(data_loc)
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
                               hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,
                               start_token=self.start_token)
         self.set_generator(generator)
 
-        gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        oracle_dataloader = None
-        dis_dataloader = None
-
-        self.set_data_loader(gen_loader=gen_dataloader, dis_loader=dis_dataloader, oracle_loader=oracle_dataloader)
+        self.set_data_loader()
+        self.oracle_data_loader = None
+        self.dis_data_loader = None
         tokens = get_tokenlized(data_loc)
         word_set = get_word_list(tokens)
         [word_index_dict, index_word_dict] = get_dict(word_set)
@@ -136,10 +136,11 @@ class Mle(Gan):
             outfile.write(text_to_code(tokens, word_index_dict, self.sequence_length))
         return word_index_dict, index_word_dict
 
-    def train_real(self, data_loc=None):
+    def train_real(self, data_loc=None, nll_test_data_loc=None):
         from utils.text_process import code_to_text
         from utils.text_process import get_tokenlized
-        wi_dict, iw_dict = self.init_real_trainng(data_loc)
+        wi_dict, iw_dict = self.init_real_training(data_loc,nll_test_data_loc)
+
 
         def get_real_test_file(dict=iw_dict):
             with open(self.generator_file, 'r') as file:
@@ -167,6 +168,3 @@ class Mle(Gan):
                 get_real_test_file()
                 self.evaluate()
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
-
-
-

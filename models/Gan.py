@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
-from utils.utils import init_sess
+from models.leakgan.LeakganDataLoader import DataLoader, DisDataloader
+from utils.utils import *
 
 
 class Gan:
@@ -10,6 +11,7 @@ class Gan:
         self.discriminator = None
         self.gen_data_loader = None
         self.dis_data_loader = None
+        self.nll_data_loader = None
         self.oracle_data_loader = None
         self.sess = init_sess()
         self.metrics = list()
@@ -18,6 +20,12 @@ class Gan:
         self.adversarial_epoch_num = 100
         self.log = None
         self.reward = None
+        self.batch_size = 64
+        self.sequence_length = None
+        self.nll_test_loc = None
+        self.oracle_file = 'save/oracle.txt'
+        self.generator_file = 'save/generator.txt'
+        self.oracle_test_file = 'save/oracle_test.txt'
 
     def set_oracle(self, oracle):
         self.oracle = oracle
@@ -28,10 +36,15 @@ class Gan:
     def set_discriminator(self, discriminator):
         self.discriminator = discriminator
 
-    def set_data_loader(self, gen_loader, dis_loader, oracle_loader):
-        self.gen_data_loader = gen_loader
-        self.dis_data_loader = dis_loader
-        self.oracle_data_loader = oracle_loader
+    def set_data_loader(self):
+        gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
+        oracle_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
+        dis_dataloader = DisDataloader(batch_size=self.batch_size, seq_length=self.sequence_length)
+        nll_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
+        self.gen_data_loader = gen_dataloader
+        self.dis_data_loader = dis_dataloader
+        self.oracle_data_loader = oracle_dataloader
+        self.nll_data_loader = nll_dataloader
 
     def set_sess(self, sess):
         self.sess = sess

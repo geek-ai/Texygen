@@ -5,9 +5,7 @@ from models.Gan import Gan
 from models.gsgan.GsganDataLoader import DataLoader, DisDataloader
 from models.gsgan.GsganDiscriminator import Discriminator
 from models.gsgan.GsganGenerator import Generator
-from utils.metrics.Bleu import Bleu
 from utils.metrics.Cfg import Cfg
-from utils.metrics.EmbSim import EmbSim
 from utils.metrics.Nll import Nll
 from utils.oracle.OracleCfg import OracleCfg
 from utils.oracle.OracleLstm import OracleLstm
@@ -33,6 +31,7 @@ class Gsgan(Gan):
 
         self.oracle_file = 'save/oracle.txt'
         self.generator_file = 'save/generator.txt'
+        self.oracle_test_file = 'save/oracle_test.txt'
         self.test_file = 'save/test_file.txt'
 
     def init_oracle_trainng(self, oracle=None):
@@ -43,37 +42,36 @@ class Gsgan(Gan):
         self.set_oracle(oracle)
 
         discriminator = Discriminator(sequence_length=self.sequence_length, num_classes=2, vocab_size=self.vocab_size,
-                                      hidden_unit=20, embedding_size=self.emb_dim, filter_sizes=self.filter_size, batch_size = self.batch_size,
+                                      hidden_unit=20, embedding_size=self.emb_dim, filter_sizes=self.filter_size,
+                                      batch_size=self.batch_size,
                                       num_filters=self.num_filters, non_static=True,
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, sess=self.sess,
-                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length, discriminator=discriminator,
+                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,
+                              discriminator=discriminator,
                               start_token=self.start_token)
         self.set_generator(generator)
 
-        gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        oracle_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        dis_dataloader = DisDataloader(batch_size=self.batch_size, seq_length=self.sequence_length)
-
-        self.set_data_loader(gen_loader=gen_dataloader, dis_loader=dis_dataloader, oracle_loader=oracle_dataloader)
+        self.set_data_loader()
 
     def init_metric(self):
 
         nll = Nll(data_loader=self.oracle_data_loader, rnn=self.oracle, sess=self.sess)
         self.add_metric(nll)
 
-        inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
-        inll.set_name('nll-test')
+        self.nll_data_loader.create_batches(self.oracle_test_file)
+        inll = Nll(data_loader=self.nll_data_loader, rnn=self.generator, sess=self.sess)
         self.add_metric(inll)
 
         from utils.metrics.DocEmbSim import DocEmbSim
-        docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file, num_vocabulary=self.vocab_size)
+        docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file,
+                           num_vocabulary=self.vocab_size)
         self.add_metric(docsim)
 
     def train_discriminator(self):
 
-        def to_one_hot(x, onehot_num = self.vocab_size):
+        def to_one_hot(x, onehot_num=self.vocab_size):
             shape = x.shape  # batch_size x seqlen
             output = np.zeros(shape=[shape[0], shape[1], onehot_num])
             for row_index in range(shape[0]):
@@ -124,6 +122,7 @@ class Gsgan(Gan):
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-gsgan.csv', 'w')
         generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
+        generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_test_file)
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)
@@ -169,21 +168,19 @@ class Gsgan(Gan):
         self.oracle.generate_oracle()
         self.vocab_size = self.oracle.vocab_size + 1
 
-
         discriminator = Discriminator(sequence_length=self.sequence_length, num_classes=2, vocab_size=self.vocab_size,
-                                      hidden_unit=20, embedding_size=self.emb_dim, filter_sizes=self.filter_size, batch_size = self.batch_size,
+                                      hidden_unit=20, embedding_size=self.emb_dim, filter_sizes=self.filter_size,
+                                      batch_size=self.batch_size,
                                       num_filters=self.num_filters, non_static=True,
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, sess=self.sess,
-                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length, discriminator=discriminator,
+                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,
+                              discriminator=discriminator,
                               start_token=self.start_token)
         self.set_generator(generator)
 
-        gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        oracle_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        dis_dataloader = DisDataloader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        self.set_data_loader(gen_loader=gen_dataloader, dis_loader=dis_dataloader, oracle_loader=oracle_dataloader)
+        self.set_data_loader()
         return oracle.wi_dict, oracle.iw_dict
 
     def init_cfg_metric(self, grammar=None):
@@ -255,29 +252,29 @@ class Gsgan(Gan):
             for _ in range(15):
                 self.train_discriminator()
 
-
-    def init_real_trainng(self, data_loc=None):
+    def init_real_training(self, data_loc=None, nll_test_loc=None):
         from utils.text_process import text_precess, text_to_code
         from utils.text_process import get_tokenlized, get_word_list, get_dict
         if data_loc is None:
             data_loc = 'data/image_coco.txt'
+        if nll_test_loc is not None:
+            self.nll_test_loc = nll_test_loc
         self.sequence_length, self.vocab_size = text_precess(data_loc)
         discriminator = Discriminator(sequence_length=self.sequence_length, num_classes=2, vocab_size=self.vocab_size,
-                                      hidden_unit=20, embedding_size=self.emb_dim, filter_sizes=self.filter_size, batch_size = self.batch_size,
+                                      hidden_unit=20, embedding_size=self.emb_dim, filter_sizes=self.filter_size,
+                                      batch_size=self.batch_size,
                                       num_filters=self.num_filters, non_static=True,
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, sess=self.sess,
-                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length, discriminator=discriminator,
+                              hidden_dim=self.hidden_dim, sequence_length=self.sequence_length,
+                              discriminator=discriminator,
                               start_token=self.start_token)
         self.set_generator(generator)
         self.set_generator(generator)
 
-        gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        oracle_dataloader = None
-        dis_dataloader = DisDataloader(batch_size=self.batch_size, seq_length=self.sequence_length)
-
-        self.set_data_loader(gen_loader=gen_dataloader, dis_loader=dis_dataloader, oracle_loader=oracle_dataloader)
+        self.set_data_loader()
+        self.oracle_data_loader = None
         tokens = get_tokenlized(data_loc)
         word_set = get_word_list(tokens)
         [word_index_dict, index_word_dict] = get_dict(word_set)
@@ -287,17 +284,22 @@ class Gsgan(Gan):
 
     def init_real_metric(self):
         from utils.metrics.DocEmbSim import DocEmbSim
-        docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file, num_vocabulary=self.vocab_size)
+        docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file,
+                           num_vocabulary=self.vocab_size)
         self.add_metric(docsim)
 
-        inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
+        if self.nll_test_loc is not None:
+            self.nll_data_loader.create_batches(self.nll_test_loc)
+            inll = Nll(data_loader=self.nll_data_loader, rnn=self.generator, sess=self.sess)
+        else:
+            inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
         inll.set_name('nll-test')
         self.add_metric(inll)
 
-    def train_real(self, data_loc=None):
+    def train_real(self, data_loc=None, nll_test_loc=None):
         from utils.text_process import code_to_text
         from utils.text_process import get_tokenlized
-        wi_dict, iw_dict = self.init_real_trainng(data_loc)
+        wi_dict, iw_dict = self.init_real_training(data_loc, nll_test_loc)
         self.init_real_metric()
 
         def get_real_test_file(dict=iw_dict):
@@ -349,4 +351,3 @@ class Gsgan(Gan):
 
             for _ in range(15):
                 self.train_discriminator()
-

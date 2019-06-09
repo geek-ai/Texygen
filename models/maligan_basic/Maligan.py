@@ -2,11 +2,8 @@ from time import time
 
 from models.Gan import Gan
 from models.maligan_basic.MailganDiscriminator import Discriminator
-from models.maligan_basic.MaliganDataLoader import DataLoader, DisDataloader
 from models.maligan_basic.MaliganGenerator import Generator
 from models.maligan_basic.MaliganReward import Reward
-from utils.metrics.Bleu import Bleu
-from utils.metrics.EmbSim import EmbSim
 from utils.metrics.Nll import Nll
 from utils.oracle.OracleLstm import OracleLstm
 from utils.utils import *
@@ -30,6 +27,7 @@ class Maligan(Gan):
 
         self.oracle_file = 'save/oracle.txt'
         self.generator_file = 'save/generator.txt'
+        self.oracle_test_file = 'save/oracle_test.txt'
         self.test_file = 'save/test_file.txt'
 
     def init_oracle_trainng(self, oracle=None):
@@ -49,17 +47,14 @@ class Maligan(Gan):
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
 
-        gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        oracle_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        dis_dataloader = DisDataloader(batch_size=self.batch_size, seq_length=self.sequence_length)
-
-        self.set_data_loader(gen_loader=gen_dataloader, dis_loader=dis_dataloader, oracle_loader=oracle_dataloader)
+        self.set_data_loader()
 
     def init_metric(self):
         nll = Nll(data_loader=self.oracle_data_loader, rnn=self.oracle, sess=self.sess)
         self.add_metric(nll)
 
-        inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
+        self.nll_data_loader.create_batches(self.oracle_test_file)
+        inll = Nll(data_loader=self.nll_data_loader, rnn=self.generator, sess=self.sess)
         inll.set_name('nll-test')
         self.add_metric(inll)
 
@@ -104,6 +99,7 @@ class Maligan(Gan):
         self.adversarial_epoch_num = 100
         self.log = open('experiment-log-maligan-basic.csv', 'w')
         generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_file)
+        generate_samples(self.sess, self.oracle, self.batch_size, self.generate_num, self.oracle_test_file)
         generate_samples(self.sess, self.generator, self.batch_size, self.generate_num, self.generator_file)
         self.gen_data_loader.create_batches(self.oracle_file)
         self.oracle_data_loader.create_batches(self.generator_file)
@@ -163,10 +159,7 @@ class Maligan(Gan):
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
 
-        gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        oracle_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        dis_dataloader = DisDataloader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        self.set_data_loader(gen_loader=gen_dataloader, dis_loader=dis_dataloader, oracle_loader=oracle_dataloader)
+        self.set_data_loader()
         return oracle.wi_dict, oracle.iw_dict
 
     def init_cfg_metric(self, grammar=None):
@@ -251,11 +244,13 @@ class Maligan(Gan):
                 self.train_discriminator()
         return
 
-    def init_real_trainng(self, data_loc=None):
+    def init_real_training(self, data_loc=None, nll_test_loc=None):
         from utils.text_process import text_precess, text_to_code
         from utils.text_process import get_tokenlized, get_word_list, get_dict
         if data_loc is None:
             data_loc = 'data/image_coco.txt'
+        if nll_test_loc is not None:
+            self.nll_test_loc = nll_test_loc
         self.sequence_length, self.vocab_size = text_precess(data_loc)
 
         generator = Generator(num_vocabulary=self.vocab_size, batch_size=self.batch_size, emb_dim=self.emb_dim,
@@ -268,11 +263,8 @@ class Maligan(Gan):
                                       l2_reg_lambda=self.l2_reg_lambda)
         self.set_discriminator(discriminator)
 
-        gen_dataloader = DataLoader(batch_size=self.batch_size, seq_length=self.sequence_length)
-        oracle_dataloader = None
-        dis_dataloader = DisDataloader(batch_size=self.batch_size, seq_length=self.sequence_length)
-
-        self.set_data_loader(gen_loader=gen_dataloader, dis_loader=dis_dataloader, oracle_loader=oracle_dataloader)
+        self.set_data_loader()
+        self.oracle_data_loader = None
         tokens = get_tokenlized(data_loc)
         word_set = get_word_list(tokens)
         [word_index_dict, index_word_dict] = get_dict(word_set)
@@ -285,14 +277,18 @@ class Maligan(Gan):
         docsim = DocEmbSim(oracle_file=self.oracle_file, generator_file=self.generator_file, num_vocabulary=self.vocab_size)
         self.add_metric(docsim)
 
-        inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
+        if self.nll_test_loc is not None:
+            self.nll_data_loader.create_batches(self.nll_test_loc)
+            inll = Nll(data_loader=self.nll_data_loader, rnn=self.generator, sess=self.sess)
+        else:
+            inll = Nll(data_loader=self.gen_data_loader, rnn=self.generator, sess=self.sess)
         inll.set_name('nll-test')
         self.add_metric(inll)
 
-    def train_real(self, data_loc=None):
+    def train_real(self, data_loc=None, nll_test_loc=None):
         from utils.text_process import code_to_text
         from utils.text_process import get_tokenlized
-        wi_dict, iw_dict = self.init_real_trainng(data_loc)
+        wi_dict, iw_dict = self.init_real_training(data_loc, nll_test_loc)
         self.init_real_metric()
 
         def get_real_test_file(dict=iw_dict):

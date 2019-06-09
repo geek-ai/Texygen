@@ -71,6 +71,7 @@ def get_dict(word_set):
         index += 1
     return word_index_dict, index_word_dict
 
+
 def text_precess(train_text_loc, test_text_loc=None):
     train_tokens = get_tokenlized(train_text_loc)
     if test_text_loc is None:

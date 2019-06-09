@@ -32,7 +32,6 @@ def set_gan(gan_name):
         sys.exit(-2)
 
 
-
 def set_training(gan, training_method):
     try:
         if training_method == 'oracle':
@@ -52,13 +51,13 @@ def set_training(gan, training_method):
 
 def parse_cmd(argv):
     try:
-        opts, args = getopt.getopt(argv, "hg:t:d:")
+        opts, args = getopt.getopt(argv, "hg:t:d:e:")
 
         opt_arg = dict(opts)
         if '-h' in opt_arg.keys():
             print('usage: python main.py -g <gan_type>')
             print('       python main.py -g <gan_type> -t <train_type>')
-            print('       python main.py -g <gan_type> -t realdata -d <your_data_location>')
+            print('       python main.py -g <gan_type> -t realdata -d <your_data_location> -e <nll_test_file>')
             sys.exit(0)
         if not '-g' in opt_arg.keys():
             print('unspecified GAN type, use MLE training only...')
@@ -69,10 +68,12 @@ def parse_cmd(argv):
             gan.train_oracle()
         else:
             gan_func = set_training(gan, opt_arg['-t'])
-            if opt_arg['-t'] == 'real' and '-d' in opt_arg.keys():
-                gan_func(opt_arg['-d'])
+            if opt_arg['-t'] == 'real' and '-d' in opt_arg.keys() and '-e' in opt_arg.keys():
+                gan_func(opt_arg['-d'], opt_arg['-e'])
             else:
                 gan_func()
+            if opt_arg['-t'] == 'real' and '-d' in opt_arg.keys():
+                gan_func(opt_arg['-d'])
     except getopt.GetoptError:
         print('invalid arguments!')
         print('`python main.py -h`  for help')

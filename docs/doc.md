@@ -12,10 +12,11 @@ python main.py -g <GAN type> -t <training method> -d <data location>
     specify the traning method in the experiment
     <training method> = oracle | cfg | real
     default is oracle
-  -d <data location>
+  -d <data location> -e <nll test data location>
     use user's own dataset
     only avaiable with real data training 
     default is 'data/image_coco.txt'
+    -e to use nll test evaluation
 ```
 
 ### Quick tutorial
